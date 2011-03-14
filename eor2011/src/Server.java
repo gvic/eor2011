@@ -92,7 +92,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			Registry registry = LocateRegistry.createRegistry(port);
 
 			// Création d'un serveur
-			Server server = new Server();
+			Server_itf server = new Server();
 
 			// Calcul de l’URL du serveur
 			URL = "//" + InetAddress.getLocalHost().getHostName() + ":" + port

@@ -22,7 +22,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		try {
 		    int port = 12596;
 		    String URL = "//bouba:"+port+"/ox";
-		    server = (Server) Naming.lookup(URL);
+		    server = (Server_itf) Naming.lookup(URL);
 		} catch (Exception ex) {
 		    ex.printStackTrace();
 		}
