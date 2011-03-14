@@ -5,10 +5,12 @@ import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf {
 
+	// The server
+	private static Server_itf server;
+	
 	public Client() throws RemoteException {
 		super();
 	}
-
 
 ///////////////////////////////////////////////////
 //         Interface to be used by applications
@@ -16,11 +18,19 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// initialization of the client layer
 	public static void init() {
+		// Lookup in the Naming space
+		try {
+		    int port = 12596;
+		    String URL = "//bouba:"+port+"/ox";
+		    server = (Server) Naming.lookup(URL);
+		} catch (Exception ex) {
+		    ex.printStackTrace();
+		}
 	}
 	
 	// lookup in the name server
 	public static SharedObject lookup(String name) {
-		return ;
+		return null;
 	}		
 	
 	// binding in the name server
@@ -29,6 +39,21 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// creation of a shared object
 	public static SharedObject create(Object o) {
+		// Create ServerObject in da server
+		int id;
+		SharedObject so = null;
+		try {
+			id = server.create(o);
+			so = new SharedObject(o,id);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} finally {
+			System.out.println("Can't create SharedObject because of the server");
+		}
+		
+		
+		
+		return so;
 	}
 	
 /////////////////////////////////////////////////////////////
@@ -56,4 +81,5 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
 	}
+	
 }
