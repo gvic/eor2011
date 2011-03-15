@@ -8,7 +8,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// The server
 	private static Server_itf server;
-	private static HashMap<String, SharedObject_itf> sharedObjectsList;
+	private static HashMap<String, SharedObject> sharedObjectsList;
 	
 	public Client() throws RemoteException {
 		super();
