@@ -1,12 +1,14 @@
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
+import java.util.HashMap;
 import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// The server
 	private static Server_itf server;
+	private static HashMap<String, SharedObject_itf> sharedObjectsList;
 	
 	public Client() throws RemoteException {
 		super();
@@ -32,14 +34,18 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	public static SharedObject lookup(String name) {
 		/* Si l'objet partagé existe déjà dans le serveur eg il a un id */
 		int id = -1;
+		SharedObject so = null;
+		
 		try {
 			id = server.lookup(name);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-		} 
-		if( id != -1){
-			
 		}
+		
+		if( id != -1){
+			so = sharedObjectsList.get(name);
+		}
+		return so;			/*****************ATTENTION************/
 	}		
 	
 	// binding in the name server
@@ -49,6 +55,9 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		
+		/* Et on ajoute également le sharedobject a la liste local */
+		sharedObjectsList.put(name,so);
 	}
 
 	// creation of a shared object
