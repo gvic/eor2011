@@ -5,7 +5,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// THE object
 	public Object obj;
 	// Object id 
-	private int id;
+	public int id;
 	
 	public SharedObject() {
 	}
@@ -40,6 +40,4 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	public synchronized Object invalidate_writer() {
 	}
 	
-	public int getId() { return id;	}
-
 }

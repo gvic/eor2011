@@ -3,10 +3,14 @@ import java.io.Serializable;
 
 public class ServerObject implements ServerObject_itf, Serializable {
 
-	private Object obj;
-	private int id;
+	public Object obj;
+	public int id;
 
+	public ServerObject(){
+	}
+	
 	public ServerObject(Object o, int i){
+		this();
 		this.obj = o;
 		this.id = i;
 	}
@@ -22,8 +26,5 @@ public class ServerObject implements ServerObject_itf, Serializable {
 		// TODO Auto-generated method stub
 		
 	}
-
-	public int getId() { return id;	}
-
 	
 }

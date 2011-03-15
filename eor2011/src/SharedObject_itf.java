@@ -6,6 +6,4 @@ public interface SharedObject_itf {
 	
 	public void unlock();
 	
-	public int getId();
-	
 }

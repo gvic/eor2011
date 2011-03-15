@@ -63,8 +63,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Can't create SharedObject because of the server");
-		}
-		
+		}		
 		
 		
 		return so;

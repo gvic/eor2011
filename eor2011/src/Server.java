@@ -9,14 +9,17 @@ import java.util.HashMap;
 public class Server extends UnicastRemoteObject implements Server_itf {
 
 	/*
-	 * HashMap which contains THE serverObjects
+	 * HashMapS which contain serverObjects (either registered or not)
 	 */
 	private HashMap<String, ServerObject_itf> serverObjectsList;
 	private HashMap<Integer, ServerObject_itf> notRegisteredServerObject;
+	
+	// static count number 
 	private int idCpt = 0;
 	
 	protected Server() throws RemoteException {
 		serverObjectsList =  new HashMap<String, ServerObject_itf>();
+		notRegisteredServerObject = new HashMap<Integer, ServerObject_itf>();
 	}
 
 	/*
@@ -31,7 +34,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	}
 
 	/*
-	 * Create the ServerObject related to the SharedObject
+	 * Registers an object with a name.
 	 * 
 	 * @see Server_itf#register(java.lang.String, int)
 	 */
