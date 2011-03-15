@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 
-public class ServerObject implements ServerObject_itf, Serializable {
+public class ServerObject implements Serializable, ServerObject_itf {
 
 	public Object obj;
 	public int id;
