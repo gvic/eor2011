@@ -29,7 +29,6 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public int lookup(String name) throws RemoteException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -72,7 +71,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
@@ -83,7 +82,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
