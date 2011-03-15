@@ -12,6 +12,8 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 * HashMap which contains THE serverObjects
 	 */
 	private HashMap<String, ServerObject_itf> serverObjectsList;
+	private HashMap<Integer, ServerObject_itf> notRegisteredServerObject;
+	private int idCpt = 0;
 	
 	protected Server() throws RemoteException {
 		serverObjectsList =  new HashMap<String, ServerObject_itf>();
@@ -35,9 +37,17 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public void register(String name, int id) throws RemoteException {
-
-
+		ServerObject_itf so = notRegisteredServerObject.get(id);
+		/* Petite vérification ... */
+		if(id == so.getId()){
+			serverObjectsList.put(name, so); // A VERIFIER...
+		}
+		else{
+			System.out.println("Les id ne correspondent pas");
+			System.exit(0);
+		}
 	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -46,8 +56,10 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public int create(Object o) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		idCpt++;
+		ServerObject_itf so = new ServerObject(o,idCpt);
+		notRegisteredServerObject.put(idCpt,so);
+		return this.idCpt;
 	}
 
 	/*

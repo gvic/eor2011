@@ -30,16 +30,30 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	
 	// lookup in the name server
 	public static SharedObject lookup(String name) {
-		return null;
+		/* Si l'objet partagé existe déjà dans le serveur eg il a un id */
+		int id = -1;
+		try {
+			id = server.lookup(name);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} 
+		if( id != -1){
+			
+		}
 	}		
 	
 	// binding in the name server
 	public static void register(String name, SharedObject_itf so) {
+		try {
+			server.register(name, so.getId());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// creation of a shared object
 	public static SharedObject create(Object o) {
-		// Create ServerObject in da server
+	// Create ServerObject in the server
 		int id;
 		SharedObject so = null;
 		try {
