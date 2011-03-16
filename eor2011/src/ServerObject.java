@@ -8,7 +8,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	private static final int WL = 2; // WL : 2 : write locked
 	
 	// The object
-	Object obj;
+	public Object obj;
 	// Object id 
 	int id;
 

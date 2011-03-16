@@ -44,7 +44,12 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		
 		if( id != -1){
 			// COMMENT RENVOYER UN SHAREDOBJECT ???
-			ServerObject servObj = (ServerObject) ((Server) server).serverObjectsList.get(name);
+			so = sharedObjectsList.get(id);
+			if (so == null){ // C'est que l'objet a été crée par un autre client (distant)
+				Object ob = ((ServerObject) ((Server) server).serverObjectsList.get(id)).obj;
+				so = new SharedObject(ob ,id);
+				sharedObjectsList.put(name,so);
+			}
 		}
 		return so;			/*****************ATTENTION************/
 	}		
