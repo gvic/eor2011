@@ -43,15 +43,16 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		}
 		
 		if( id != -1){
-			so = sharedObjectsList.get(name);
+			// COMMENT RENVOYER UN SHAREDOBJECT ???
+			ServerObject servObj = (ServerObject) ((Server) server).serverObjectsList.get(name);
 		}
 		return so;			/*****************ATTENTION************/
 	}		
 	
 	// binding in the name server
-	public static void register(String name, SharedObject_itf so) {
+	public static void register(String name, SharedObject so) {
 		try {
-			server.register(name, so.getId());
+			server.register(name, so.id);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

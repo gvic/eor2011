@@ -10,8 +10,9 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 
 	/*
 	 * HashMapS which contain serverObjects (either registered or not)
+	 * public accessor needed by the Clien method lookup
 	 */
-	private HashMap<String, ServerObject_itf> serverObjectsList;
+	public HashMap<String, ServerObject_itf> serverObjectsList;
 	private HashMap<Integer, ServerObject_itf> notRegisteredServerObject;
 	
 	// static count number 
@@ -29,7 +30,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public int lookup(String name) throws RemoteException {
-		return 0;
+		return ((ServerObject) serverObjectsList.get(name)).id;
 	}
 
 	/*
@@ -41,7 +42,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	public void register(String name, int id) throws RemoteException {
 		ServerObject_itf so = notRegisteredServerObject.get(id);
 		/* Petite vérification ... */
-		if(id == so.getId()){
+		if(id == ((ServerObject)so).id){
 			serverObjectsList.put(name, so); // A VERIFIER...
 		}
 		else{
