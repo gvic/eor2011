@@ -27,6 +27,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		    server = (Server_itf) Naming.lookup(URL);
 		} catch (Exception ex) {
 		    ex.printStackTrace();
+		    System.out.println("Did you launch the server?");
 		    System.exit(0);
 		}
 		
@@ -43,17 +44,24 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			id = server.lookup(name);
 		} catch (RemoteException e) { // Remote problem
 			e.printStackTrace();
-		} catch (Exception e) { // the object *name* doesn't exist on the server.. 
-			e.printStackTrace();
+		} catch (Exception ex) { 
+			ex.printStackTrace();
+			System.out.println("the object "+ name + " doesn't exist on the server.");
 		}
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
 		if( id != -1){
-			// Remote call to retrieve the Object
-			Object ob = ((ServerObject) ((Server) server).serverObjectsList.get(id)).obj;
-			
-			so = new SharedObject(ob ,id);
-			sharedObjectsList.put(name,so);
+			try {
+				// Remote call to retrieve the Object
+				Object ob = ((ServerObject) ((Server) server).getServerObject(name)).obj;
+				
+				// Create local copy of the ServerObject
+				so = new SharedObject(ob,id);
+				sharedObjectsList.put(name,so);
+				
+			} catch (RemoteException exc) {
+				exc.printStackTrace();
+			}
 		}
 		return so;			
 	}		

@@ -32,6 +32,13 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	public int lookup(String name) throws RemoteException {
 		return ((ServerObject) serverObjectsList.get(name)).id;
 	}
+	
+	/*
+	 * Method used to retrieve the real object (!= lookup)
+	 */
+	public ServerObject_itf getServerObject(String name) throws RemoteException {		
+		return serverObjectsList.get(name);
+	}
 
 	/*
 	 * Registers an object with a name.
@@ -49,7 +56,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			System.out.println("Object "+id+" doesn't exist on the Server");
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -121,5 +128,4 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			exc.printStackTrace();
 		}
 	}
-
 }
