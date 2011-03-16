@@ -20,14 +20,18 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// initialization of the client layer
 	public static void init() {
-		// Lookup in the Naming space
+		// Lookup for the server in the Naming space
 		try {
 		    int port = 12596;
-		    String URL = "//bouba:"+port+"/ox";
+		    String URL = "//" + InetAddress.getLocalHost().getHostName() + ":"+port+"/ox";
 		    server = (Server_itf) Naming.lookup(URL);
 		} catch (Exception ex) {
 		    ex.printStackTrace();
+		    System.exit(0);
 		}
+		
+		// Create the sharedObjectsList
+		sharedObjectsList = new HashMap<String, SharedObject>();
 	}
 	
 	// lookup in the name server
@@ -37,19 +41,19 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		
 		try {
 			id = server.lookup(name);
-		} catch (RemoteException e) {
+		} catch (RemoteException e) { // Remote problem
+			e.printStackTrace();
+		} catch (Exception e) { // the object *name* doesn't exist on the server.. 
 			e.printStackTrace();
 		}
 		
-		/* Si l'objet partagé existe déjà dans le serveur eg il a un id */
+		// Object *name* found on the server (server.lookup() didn't throw an exception)
 		if( id != -1){
-			// COMMENT RENVOYER UN SHAREDOBJECT ???
-			so = sharedObjectsList.get(id);
-			if (so == null){ // C'est que l'objet a été crée par un autre client (distant)
-				Object ob = ((ServerObject) ((Server) server).serverObjectsList.get(id)).obj;
-				so = new SharedObject(ob ,id);
-				sharedObjectsList.put(name,so);
-			}
+			// Remote call to retrieve the Object
+			Object ob = ((ServerObject) ((Server) server).serverObjectsList.get(id)).obj;
+			
+			so = new SharedObject(ob ,id);
+			sharedObjectsList.put(name,so);
 		}
 		return so;			
 	}		
@@ -62,7 +66,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		}
 		
-		/* Et on ajoute également le sharedobject a la liste local */
+		// Add the object to the SharedObjectsList
 		sharedObjectsList.put(name,so);
 	}
 

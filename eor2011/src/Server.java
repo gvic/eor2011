@@ -42,15 +42,13 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	public void register(String name, int id) throws RemoteException {
 		ServerObject_itf so = notRegisteredServerObject.get(id);
 		/* Petite vérification ... */
-		if(id == ((ServerObject)so).id){
-			serverObjectsList.put(name, so); // A VERIFIER...
+		if(so != null){
+			serverObjectsList.put(name, so);
 		}
 		else{
-			System.out.println("Les id ne correspondent pas");
-			System.exit(0);
+			System.out.println("Object "+id+" doesn't exist on the Server");
 		}
 	}
-	
 
 	/*
 	 * (non-Javadoc)
@@ -88,20 +86,22 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	}
 
 	/**
-	 * @param args
+	 * Main method :
+	 * Instanciate the server and bind it to the RMI Naming space
+	 * @param args contains the server port
 	 */
-
 	public static void main(String args[]) {
 		int port;
 		String URL;
 		try {
-			// transformation d’une chaîne de caractères en entier
+			// Parse String into an Integer
 			Integer I = new Integer(args[0]);
 			port = I.intValue();
 		} catch (Exception ex) {
 			System.out.println(" Please enter: Server <port>");
 			return;
 		}
+		
 		try {
 			// Création du serveur de nom - rmiregistry
 			Registry registry = LocateRegistry.createRegistry(port);
@@ -114,7 +114,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 					+ "/ox";
 			Naming.bind(URL, server);
 
-			System.out.println("Server lancé à l'adresse : ");
+			System.out.println("Server launched : ");
 			System.out.println(URL);
 
 		} catch (Exception exc) {
