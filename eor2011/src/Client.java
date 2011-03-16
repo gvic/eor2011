@@ -32,7 +32,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	
 	// lookup in the name server
 	public static SharedObject lookup(String name) {
-		/* Si l'objet partagé existe déjà dans le serveur eg il a un id */
 		int id = -1;
 		SharedObject so = null;
 		
@@ -42,6 +41,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		}
 		
+		/* Si l'objet partagé existe déjà dans le serveur eg il a un id */
 		if( id != -1){
 			// COMMENT RENVOYER UN SHAREDOBJECT ???
 			so = sharedObjectsList.get(id);
@@ -51,7 +51,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 				sharedObjectsList.put(name,so);
 			}
 		}
-		return so;			/*****************ATTENTION************/
+		return so;			
 	}		
 	
 	// binding in the name server
