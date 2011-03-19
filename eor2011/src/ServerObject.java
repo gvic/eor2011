@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.HashMap;
 
 
 public class ServerObject implements Serializable, ServerObject_itf {
@@ -13,7 +14,11 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	int id;
 
 	// The lock
-	int lock;       
+	int lock;    
+	
+	//reader Clients
+	private HashMap<Integer, Client_itf> readerClients;
+	private Client_itf writerClient;
 	
 	// Default constructor : start with No Lock
 	public ServerObject() {
@@ -28,12 +33,12 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	}
 	
 	@Override
-	public void lock_read() {
+	public void lock_read(Client_itf c) {
 		
 	}
 
 	@Override
-	public void lock_write() {
+	public void lock_write(Client_itf c) {
 		
 	}
 	
