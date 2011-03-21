@@ -122,13 +122,43 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 	// callback invoked remotely by the server
 	public synchronized Object reduce_lock() {
+		
+		switch(lock){  
+			/* Se reporter au diagramme d'états diapo 27 des slides */
+			case WLC: 		lock = RLC;		break;
+			case WLT: 		lock = RLC;		break;		
+			case RLT_WLC:	lock = RLT;		break;  	
+			default: 						break;
+		}
+		
+		return obj;		
 	}
+	
 
 	// callback invoked remotely by the server
 	public synchronized void invalidate_reader() {
+		
+		switch(lock){  
+			/* Se reporter au diagramme d'états diapo 27 des slides */
+			case RLC: 		lock = NL;		break;
+			case RLT:	 	lock = NL;		break;   	
+			default: 						break;
+		}
+		
 	}
 
 	public synchronized Object invalidate_writer() {
+
+		switch(lock){
+			/* Se reporter au diagramme d'états diapo 27 des slides */
+			case WLC: 		lock = NL;		break;
+			case WLT: 		lock = NL;		break;		
+			case RLT_WLC:	lock = NL;		break;  	
+			default: 						break;
+		
+		}
+		
+		return obj;	
 	}
 	
 }

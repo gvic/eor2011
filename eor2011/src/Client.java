@@ -22,7 +22,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	public static void init() {
 		// Lookup for the server in the Naming space
 		try {
-		    int port = 12596;
+		    int port = 8008;
 		    String URL = "//" + InetAddress.getLocalHost().getHostName() + ":"+port+"/ox";
 		    server = (Server_itf) Naming.lookup(URL);
 		} catch (Exception ex) {
@@ -46,7 +46,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		} catch (Exception ex) { 
 			ex.printStackTrace();
-			System.out.println("the object "+ name + " doesn't exist on the server.");
+			System.out.println("The object "+ name + " doesn't exist on the server.");
 		}
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
@@ -88,8 +88,10 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			so = new SharedObject(o,id);
 		} catch (RemoteException e) {
 			e.printStackTrace();
+			System.out.println(e.getCause().toString());
 		} finally {
 			System.out.println("Can't create SharedObject because of the server");
+			
 		}		
 		
 		
