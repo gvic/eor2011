@@ -48,7 +48,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			break;
 		case RLT: /* Nothing to do */
 			break;
-		case WLT: /* Warning the user, he has to unlock the WL himself */
+		case WLT: /* Warn the user, he has to unlock the WL himself */
 			System.out.println("You had not release the write lock");
 			break;
 		case RLT_WLC:
@@ -70,19 +70,21 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		case NL: 
 			Client.lock_write(id);
+			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 			break;
 		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
 			Client.lock_write(id);
+			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 			break;
 		case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
 			lock = WLT;
 			break;
-		case RLT: /* We suppose that it's possible to increase the lock level without unlocking it before */
-			Client.lock_write(id);
+		case RLT: /* The clien cannot switch directly into WLT state from RLT state */
+			System.out.println("You have to remove the reader lock before using a write lock.");
+			break;
 		case WLT: /* Nothing to do */
 			break;
-		case RLT_WLC:
-			Client.lock_write(id);
+		case RLT_WLC: /* Nothing to do */
 			break;
 		
 		default: break;
