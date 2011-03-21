@@ -117,6 +117,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		}
 		
+		this.notify(); // Le sharedObject notifie qu'il a finit son travail
+		
 	}
 
 
@@ -130,6 +132,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			case RLT_WLC:	lock = RLT;		break;  	
 			default: 						break;
 		}
+		
+		// Peut etre faut-il mettre un notify selon la valeur du lock ici ?? -> diapo 28 slides
 		
 		return obj;		
 	}

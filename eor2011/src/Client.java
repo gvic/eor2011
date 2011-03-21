@@ -122,6 +122,11 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
 		SharedObject o = sharedObjectsList.get(id);
+		try {
+			o.wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		o.reduce_lock();
 		return o.obj;
 	}
