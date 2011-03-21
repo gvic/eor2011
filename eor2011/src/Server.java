@@ -10,7 +10,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 
 	/*
 	 * HashMapS which contain serverObjects (either registered or not)
-	 * public accessor needed by the Clien method lookup
+	 * public accessor needed by the Client method lookup
 	 */
 	public HashMap<String, ServerObject_itf> serverObjectsList;
 	private HashMap<Integer, ServerObject_itf> notRegisteredServerObject;
@@ -71,26 +71,27 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * "Les appels au serveur sont transférés au ServerObject concerné"
 	 * 
 	 * @see Server_itf#lock_read(int, Client_itf)
 	 */
 	@Override
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
-		
-		return null;
+		ServerObject_itf so = serverObjectsList.get(id);
+		Object o = so.lock_read(client);
+		return o;
 	}
 
 	/*
-	 * (non-Javadoc)
+	 * "Les appels au serveur sont transférés au ServerObject concerné"
 	 * 
 	 * @see Server_itf#lock_write(int, Client_itf)
 	 */
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
-
-		return null;
-	}
+		ServerObject_itf so = serverObjectsList.get(id);
+		Object o = so.lock_write(client);
+		return o;	}
 
 	/**
 	 * Main method :

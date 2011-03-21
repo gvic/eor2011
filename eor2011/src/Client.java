@@ -104,17 +104,15 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// CLIENT ----> SERVER
 	// request a read lock from the server
-	public static Object lock_read(int id) {
-		SharedObject o = sharedObjectsList.get(id);
-		server.lock_read(id, ??);
-		return o.obj;
+	public static Object lock_read(int id) {		
+		Object o = server.lock_read(id, ? this ?);
+		return o;
 	}
 
 	// request a write lock from the server
 	public static Object lock_write (int id) {
-		SharedObject o = sharedObjectsList.get(id);
-		server.lock_write(id, ??);
-		return o.obj;
+		Object o = server.lock_write(id, ??);
+		return o;
 	}
 
 	

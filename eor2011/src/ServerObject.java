@@ -23,6 +23,8 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	// Default constructor : start with No Lock
 	public ServerObject() {
 		lock = NL;
+		readerClients = new HashMap<Integer, Client_itf>();
+		writerClient = null;
 	}
 	
 	// Constructor used to create a ServerObject
@@ -33,13 +35,13 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	}
 	
 	@Override
-	public void lock_read(Client_itf c) {
-		
+	public Object lock_read(Client_itf c) {
+		return null;		
 	}
 
 	@Override
-	public void lock_write(Client_itf c) {
-		
+	public Object lock_write(Client_itf c) {
+		return null;
 	}
 	
 }
