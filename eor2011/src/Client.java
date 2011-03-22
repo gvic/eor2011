@@ -149,7 +149,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		}
 		o.reduce_lock();
-		return o.obj;
+		return o.getObj();
 	}
 
 
@@ -161,9 +161,9 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
-		SharedObject o = sharedObjectsList.get(id);
+		SharedObject_itf o = sharedObjectsList.get(id);
 		o.invalidate_writer();
-		return o.obj;		
+		return o.getObj();		
 	}
 	
 }

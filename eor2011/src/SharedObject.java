@@ -166,5 +166,15 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		return obj;	
 	}
+
+	@Override
+	public int getId() {
+		return this.id;
+	}
+
+	@Override
+	public Object getObj() {
+		return this.obj;
+	}
 	
 }
