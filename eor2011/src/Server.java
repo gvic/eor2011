@@ -33,8 +33,8 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	@Override
 	public int lookup(String name) throws RemoteException {
 		int i = -1;
-		ServerObject_itf so = serverObjectsList.get(name).getSecond();
-		if (so != null) {
+		Pair<Integer, ServerObject_itf> p = serverObjectsList.get(name);
+		if (p != null) {
 			i = serverObjectsList.get(name).getFirst();
 		}
 		return i;

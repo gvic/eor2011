@@ -1,9 +1,8 @@
-import java.rmi.*;
+import java.net.InetAddress;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.rmi.registry.*;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf {
 
@@ -148,21 +147,21 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		o.reduce_lock();
+		((SharedObject) o).reduce_lock();
 		return o.getObj();
 	}
 
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
-		sharedObjectsList.get(id).invalidate_reader();
+		((SharedObject) sharedObjectsList.get(id)).invalidate_reader();
 	}
 
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
 		SharedObject_itf o = sharedObjectsList.get(id);
-		o.invalidate_writer();
+		((SharedObject) o).invalidate_writer();
 		return o.getObj();		
 	}
 	
