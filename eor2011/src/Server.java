@@ -12,14 +12,15 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 * HashMapS which contain serverObjects (either registered or not)
 	 * public accessor needed by the Client method lookup
 	 */
-	public HashMap<String, ServerObject_itf> serverObjectsList;
+	public HashMap<String, Pair<Integer, ServerObject_itf>> serverObjectsList;
 	private HashMap<Integer, ServerObject_itf> notRegisteredServerObject;
 	
-	// static count number 
-	private int idCpt = 0;
+	// count number (Integer in order to use locks on this object) 
+	private Integer idCpt = 0;
+	
 	
 	protected Server() throws RemoteException {
-		serverObjectsList =  new HashMap<String, ServerObject_itf>();
+		serverObjectsList =  new HashMap<String, Pair<Integer,ServerObject_itf>>();
 		notRegisteredServerObject = new HashMap<Integer, ServerObject_itf>();
 	}
 
@@ -30,14 +31,19 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public int lookup(String name) throws RemoteException {
-		return ((ServerObject) serverObjectsList.get(name)).id;
+		int i = -1;
+		ServerObject_itf so = serverObjectsList.get(name).getSecond();
+		if (so != null) {
+			i = serverObjectsList.get(name).getFirst();
+		}
+		return i;
 	}
 	
 	/*
 	 * Method used to retrieve the real object (!= lookup)
 	 */
 	public ServerObject_itf getServerObject(String name) throws RemoteException {		
-		return serverObjectsList.get(name);
+		return serverObjectsList.get(name).getSecond();
 	}
 
 	/*
@@ -50,7 +56,10 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 		ServerObject_itf so = notRegisteredServerObject.get(id);
 		/* Petite vérification ... */
 		if(so != null){
-			serverObjectsList.put(name, so);
+			Pair<Integer, ServerObject_itf> pair = new Pair<Integer, ServerObject_itf>(id, so);
+			serverObjectsList.put(name, pair);
+			// Alert server admin
+			System.out.println("Object "+id+" registered.");
 		}
 		else{
 			System.out.println("Object "+id+" doesn't exist on the Server");
@@ -58,16 +67,28 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	}
 	
 	/*
-	 * (non-Javadoc)
+	 * Create ServerObject
+	 * Be careful on the idCpt++ (needs synchro) 
 	 * 
 	 * @see Server_itf#create(java.lang.Object)
 	 */
 	@Override
 	public int create(Object o) throws RemoteException {
-		idCpt++;
-		ServerObject_itf so = new ServerObject(o,idCpt);
-		notRegisteredServerObject.put(idCpt,so);
-		return this.idCpt;
+		int i = -1;
+		
+		synchronized (idCpt) {
+			idCpt++;
+			
+			ServerObject_itf so = new ServerObject(o,idCpt);
+			notRegisteredServerObject.put(idCpt,so);
+			
+			// Alert server admin
+			System.out.println("Object "+idCpt+" created.");	
+			
+			i = this.idCpt;
+		}
+		
+		return i;
 	}
 
 	/*
@@ -77,7 +98,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
-		ServerObject_itf so = serverObjectsList.get(id);
+		ServerObject_itf so = serverObjectsList.get(id).getSecond();
 		Object o = so.lock_read(client);
 		return o;
 	}
@@ -89,13 +110,13 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
-		ServerObject_itf so = serverObjectsList.get(id);
+		ServerObject_itf so = serverObjectsList.get(id).getSecond();
 		Object o = so.lock_write(client);
 		return o;	}
 
 	/**
 	 * Main method :
-	 * Instanciate the server and bind it to the RMI Naming space
+	 * Instantiate the server and bind it to the RMI Naming space
 	 * @param args contains the server port
 	 */
 	public static void main(String args[]) {

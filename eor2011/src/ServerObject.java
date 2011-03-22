@@ -13,7 +13,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	// The object
 	public Object obj;
 	// Object id 
-	int id;
+	private int id;
 
 	// The lock
 	int lock;    
@@ -64,6 +64,5 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		writerClient = c; //Et on met une référence vers le nouveau client écrivain
 		
 		return o;  // On retourne l'objet touché par le dernier ecrivain
-	}
-	
+	}	
 }

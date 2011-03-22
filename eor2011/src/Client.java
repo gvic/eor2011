@@ -2,13 +2,17 @@ import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// The server
 	private static Server_itf server;
-	private static HashMap<String, SharedObject> sharedObjectsList;
+	private static Hashtable<Integer, SharedObject_itf> sharedObjectsList;
+	
+	// Instance of the client
+	private static Client_itf myClient;
 	
 	public Client() throws RemoteException {
 		super();
@@ -32,7 +36,14 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		}
 		
 		// Create the sharedObjectsList
-		sharedObjectsList = new HashMap<String, SharedObject>();
+		sharedObjectsList = new Hashtable<Integer, SharedObject_itf>();
+		// Instantiate Client object
+		try {
+			myClient = new Client();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	// lookup in the name server
@@ -51,31 +62,29 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
 		if( id != -1){
-			try {
-				// Remote call to retrieve the Object
-				Object ob = ((ServerObject) ((Server) server).getServerObject(name)).obj;
-				
-				// Create local copy of the ServerObject
-				so = new SharedObject(ob,id);
-				sharedObjectsList.put(name,so);
-				
-			} catch (RemoteException exc) {
-				exc.printStackTrace();
-			}
+//			try {
+//				// Remote call to retrieve the Object
+//				 Object ob = ((ServerObject) ((Server) server).getServerObject(name)).obj;
+//			} catch (RemoteException exc) {
+//				exc.printStackTrace();
+//			} 
+			// Create local copy of the ServerObject
+			so = new SharedObject(null,id);
+			sharedObjectsList.put(id,so);
 		}
 		return so;			
 	}		
 	
 	// binding in the name server
-	public static void register(String name, SharedObject so) {
+	public static void register(String name, SharedObject_itf so) {
 		try {
-			server.register(name, so.id);
+			server.register(name, so.getId());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		
 		// Add the object to the SharedObjectsList
-		sharedObjectsList.put(name,so);
+		sharedObjectsList.put(so.getId(),so);
 	}
 
 	// creation of a shared object
@@ -107,13 +116,25 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// CLIENT ----> SERVER
 	// request a read lock from the server
 	public static Object lock_read(int id) {		
-		Object o = server.lock_read(id, ? this ?);
+		Object o = null;
+		try {
+			o = server.lock_read(id, myClient);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return o;
 	}
 
 	// request a write lock from the server
 	public static Object lock_write (int id) {
-		Object o = server.lock_write(id, ??);
+		Object o = null;
+		try {
+			o = server.lock_write(id, myClient);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return o;
 	}
 
@@ -121,7 +142,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// SERVER ----> CLIENT
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
-		SharedObject o = sharedObjectsList.get(id);
+		SharedObject_itf o = sharedObjectsList.get(id);
 		try {
 			o.wait();
 		} catch (InterruptedException e) {
