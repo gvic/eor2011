@@ -5,6 +5,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 public class Server extends UnicastRemoteObject implements Server_itf {
 
@@ -12,16 +13,16 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 * HashMapS which contain serverObjects (either registered or not)
 	 * public accessor needed by the Client method lookup
 	 */
-	public HashMap<String, Pair<Integer, ServerObject_itf>> serverObjectsList;
-	private HashMap<Integer, ServerObject_itf> notRegisteredServerObject;
+	public Hashtable<String, Pair<Integer, ServerObject_itf>> serverObjectsList;
+	private Hashtable<Integer, ServerObject_itf> notRegisteredServerObject;
 	
 	// count number (Integer in order to use locks on this object) 
 	private Integer idCpt = 0;
 	
 	
 	protected Server() throws RemoteException {
-		serverObjectsList =  new HashMap<String, Pair<Integer,ServerObject_itf>>();
-		notRegisteredServerObject = new HashMap<Integer, ServerObject_itf>();
+		serverObjectsList =  new Hashtable<String, Pair<Integer,ServerObject_itf>>();
+		notRegisteredServerObject = new Hashtable<Integer, ServerObject_itf>();
 	}
 
 	/*
