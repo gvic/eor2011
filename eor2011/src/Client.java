@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 public class Client extends UnicastRemoteObject implements Client_itf {
 
+	private static final long serialVersionUID = 1L;
 	// The server
 	private static Server_itf server;
 	private static Hashtable<Integer, SharedObject_itf> sharedObjectsList;
@@ -40,7 +41,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		try {
 			myClient = new Client();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -61,14 +61,10 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
 		if( id != -1){
-//			try {
-//				// Remote call to retrieve the Object
-//				 Object ob = ((ServerObject) ((Server) server).getServerObject(name)).obj;
-//			} catch (RemoteException exc) {
-//				exc.printStackTrace();
-//			} 
 			// Create local copy of the ServerObject
-			so = new SharedObject(null,id);
+			Object o = lock_read(id);
+			so = new SharedObject(o,id);
+			so.unlock();
 			sharedObjectsList.put(id,so);
 		}
 		return so;			
@@ -119,7 +115,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		try {
 			o = server.lock_read(id, myClient);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return o;
@@ -131,7 +126,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		try {
 			o = server.lock_write(id, myClient);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return o;
@@ -141,28 +135,28 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// SERVER ----> CLIENT
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
-		SharedObject_itf o = sharedObjectsList.get(id);
-		try {
-			o.wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		((SharedObject) o).reduce_lock();
-		return o.getObj();
+//		SharedObject_itf o = sharedObjectsList.get(id);
+//		try {
+//			o.wait();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		((SharedObject) o).reduce_lock();
+//		return o.getObj();
+		// It's better to return this statement below, 
+		// all the synchronization verifications are made in the SharedObject class
+		return ((SharedObject) sharedObjectsList.get(id)).reduce_lock();
 	}
-
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
 		((SharedObject) sharedObjectsList.get(id)).invalidate_reader();
 	}
 
-
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
-		SharedObject_itf o = sharedObjectsList.get(id);
-		((SharedObject) o).invalidate_writer();
-		return o.getObj();		
+		return ((SharedObject) sharedObjectsList.get(id)).invalidate_writer();
+		//return o.getObj();		
 	}
 	
 }
