@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 public class ServerObject implements Serializable, ServerObject_itf {
 
+	private static final long serialVersionUID = 1L;
 	private static final int NL = 0; // NL : 0 : no local lock
 	private static final int RL = 1; // RL : 1 : read locked
 	private static final int WL = 2; // WL : 2 : write locked
@@ -50,12 +51,13 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	@Override
 	public Object lock_write(Client_itf c) {
 		Object o = null;
-		Iterator<Client_itf> it = readerClients.values().iterator();
-
+		Iterator<Client_itf> clts = readerClients.values().iterator();
+		
 		try{
-			o = writerClient.invalidate_writer(id); // On invalide le dernier client qui était ecrvain		
-			while(it.hasNext()){
-				it.next().invalidate_reader(id);
+			if(writerClient != null)
+				o = writerClient.invalidate_writer(id); // On invalide le dernier client qui était ecrvain		
+			while(clts.hasNext()){
+				clts.next().invalidate_reader(id);
 			}
 		} catch(RemoteException e){
 			e.printStackTrace();
