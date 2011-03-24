@@ -37,34 +37,57 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		this.id = i;
 	}
 	
+	/**
+	 * Peut être appelé par plusieurs clients, d'ou le synchronized
+	 */
 	@Override
-	public Object lock_read(Client_itf c) {
-		Object o = null;
-		try {
-			o = writerClient.reduce_lock(id);
-		} catch (RemoteException e) {
-			e.printStackTrace();
+	public synchronized Object lock_read(Client_itf c) {
+		if(lock == WL){
+			try {
+				// On récupère la derniere version de l'objet
+				obj = writerClient.reduce_lock(id);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			// L'ancien écrivain devient lecteur
+			readerClients.put(id,writerClient);
+			// Le client demandeur est aussi un lecteur
+			readerClients.put(id, c);
+			
+			// Le verrou passe en mode lecture
+			lock = RL;
 		}
-		return o; // On retourne l'objet touché par le dernier écrivain
+		return obj; // On retourne l'objet touché par le dernier écrivain
 	}
 
 	@Override
-	public Object lock_write(Client_itf c) {
-		Object o = null;
-		Iterator<Client_itf> clts = readerClients.values().iterator();
-		
+	public synchronized Object lock_write(Client_itf c) {
+
 		try{
-			if(writerClient != null)
-				o = writerClient.invalidate_writer(id); // On invalide le dernier client qui était ecrvain		
-			while(clts.hasNext()){
-				clts.next().invalidate_reader(id);
+			switch(lock){
+			case WL:
+				obj = writerClient.invalidate_writer(id); // On invalide le dernier client qui était ecrvain		
+				break;
+			case RL:
+				Iterator<Client_itf> clts = readerClients.values().iterator();
+				while(clts.hasNext()){
+					clts.next().invalidate_reader(id);
+				}
+				readerClients.clear();
+				break;
+				
+			default:break;
+				
 			}
-		} catch(RemoteException e){
+			
+			// On met a jour le client écrivain
+			writerClient = c;
+			// Le server object passe a le verrou d'ecriture
+			lock = WL;
+		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		
-		writerClient = c; //Et on met une référence vers le nouveau client écrivain
-		
-		return o;  // On retourne l'objet touché par le dernier ecrivain
+				
+		return obj;  // On retourne l'objet touché par le dernier ecrivain
 	}	
 }

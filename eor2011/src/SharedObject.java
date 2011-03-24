@@ -138,6 +138,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		}
 		
 		// Peut etre faut-il mettre un notify selon la valeur du lock ici ?? -> diapo 28 slides
+		notify();
 		
 		return obj;		
 	}
