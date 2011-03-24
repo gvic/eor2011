@@ -93,10 +93,10 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			System.out.println(e.getCause().toString());
-		} finally {
+		} /*finally {
 			System.out.println("Can't create SharedObject because of the server");
 			
-		}		
+		}	*/	
 		
 		
 		return so;
