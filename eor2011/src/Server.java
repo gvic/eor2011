@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 public class Server extends UnicastRemoteObject implements Server_itf {
@@ -14,7 +15,8 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 * HashMapS which contain serverObjects (either registered or not)
 	 * public accessor needed by the Client method lookup
 	 */
-	public Hashtable<String, Pair<Integer, ServerObject_itf>> serverObjectsList;
+	private Hashtable<String, Pair<Integer, ServerObject_itf>> serverObjectsList;
+	private HashMap<Integer, String> registeredNames; 
 	private Hashtable<Integer, ServerObject_itf> notRegisteredServerObject;
 	
 	// count number (Integer in order to use locks on this object) 
@@ -24,6 +26,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	protected Server() throws RemoteException {
 		serverObjectsList =  new Hashtable<String, Pair<Integer,ServerObject_itf>>();
 		notRegisteredServerObject = new Hashtable<Integer, ServerObject_itf>();
+		registeredNames = new HashMap<Integer, String>();
 	}
 
 	/*
@@ -60,6 +63,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 		if(so != null){
 			Pair<Integer, ServerObject_itf> pair = new Pair<Integer, ServerObject_itf>(id, so);
 			serverObjectsList.put(name, pair);
+			registeredNames.put(pair.getFirst(), name);
 			// Alert server admin
 			System.out.println("Object "+id+" registered.");
 		}
@@ -100,7 +104,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
-		ServerObject_itf so = serverObjectsList.get(id).getSecond();
+		ServerObject_itf so = serverObjectsList.get(registeredNames.get(id)).getSecond();
 		Object o = so.lock_read(client);
 		return o;
 	}
@@ -113,7 +117,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
 		// Il faut pas mettre un synchronized ici sur le lock write ?
-		ServerObject_itf so = serverObjectsList.get(id).getSecond();
+		ServerObject_itf so = serverObjectsList.get(registeredNames.get(id)).getSecond();
 		Object o = so.lock_write(client);
 		return o;	
 	}

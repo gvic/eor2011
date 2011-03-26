@@ -55,7 +55,7 @@ public class Irc extends Frame {
 		read_button.addActionListener(new readListener(this));
 		add(read_button);
 		
-		setSize(470,300);
+		setSize(570,300);
 		text.setBackground(Color.black); 
 		show();
 		

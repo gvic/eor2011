@@ -12,11 +12,11 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	private static final int RLT_WLC = 5; // RLT_WLC : 5 : read lock taken and write lock cache
 	
 	// The object
-	Object obj;
+	public Object obj;
 	// Object id 
-	int id;
+	public int id;
 	// The lock
-	int lock;       
+	public int lock;       
 	
 	// Default constructor : start with No Lock
 	public SharedObject() {
@@ -33,6 +33,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_read() {
 		
+
 		switch(lock){
 		
 		/* On fait un switch pour tout les etats de 
@@ -40,7 +41,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		 */
 		
 		case NL: 
-			Client.lock_read(id);
+			this.obj = Client.lock_read(id);
 			break;
 		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
 			lock = RLT;
@@ -71,22 +72,23 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		 */
 		
 		case NL: 
-			Client.lock_write(id);
+			obj = Client.lock_write(id); // Retrieve object
 			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 			break;
 		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
-			Client.lock_write(id);
+			// obj = Client.lock_write(id); // Retrieve object
 			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 			break;
 		case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
 			lock = WLT;
 			break;
-		case RLT: /* The clien cannot switch directly into WLT state from RLT state */
+		case RLT: /* The client cannot switch directly into WLT state from RLT state */
 			System.out.println("You have to remove the reader lock before using a write lock.");
 			break;
 		case WLT: /* Nothing to do */
 			break;
-		case RLT_WLC: /* Nothing to do */
+		case RLT_WLC: 
+			lock = WLT;
 			break;
 		
 		default: break;
