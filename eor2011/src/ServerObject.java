@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 
@@ -20,13 +21,13 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	int lock;    
 	
 	//reader Clients
-	private HashMap<Integer, Client_itf> readerClients;
+	private HashSet<Client_itf> readerClients;
 	private Client_itf writerClient;
 	
 	// Default constructor : start with No Lock
 	public ServerObject() {
 		lock = NL;
-		readerClients = new HashMap<Integer, Client_itf>();
+		readerClients = new HashSet<Client_itf>();
 		writerClient = null;
 	}
 	
@@ -50,13 +51,16 @@ public class ServerObject implements Serializable, ServerObject_itf {
 				e.printStackTrace();
 			}
 			// L'ancien écrivain devient lecteur
-			readerClients.put(id,writerClient);
-			// Le client demandeur est aussi un lecteur
-			readerClients.put(id, c);
-			
-			// Le verrou passe en mode lecture
-			lock = RL;
+			readerClients.add(writerClient);			
+			// L'ancien écrivain n'existe plus!
+			writerClient = null;
 		}
+		
+		// Le client demandeur est aussi un lecteur
+		readerClients.add(c);
+		// Le verrou passe en mode lecture
+		lock = RL;
+		
 		return obj; // On retourne l'objet touché par le dernier écrivain
 	}
 
@@ -69,17 +73,18 @@ public class ServerObject implements Serializable, ServerObject_itf {
 				obj = writerClient.invalidate_writer(id); // On invalide le dernier client qui était ecrvain		
 				break;
 			case RL:
-				Iterator<Client_itf> clts = readerClients.values().iterator();
+				Iterator<Client_itf> clts = readerClients.iterator();
 				while(clts.hasNext()){
 					clts.next().invalidate_reader(id);
 				}
-				readerClients.clear();
 				break;
 				
 			default:break;
 				
 			}
 			
+			// Vide la liste des lecteurs
+			readerClients.clear();
 			// On met a jour le client écrivain
 			writerClient = c;
 			// Le server object passe a le verrou d'ecriture

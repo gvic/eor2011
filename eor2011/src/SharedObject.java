@@ -42,6 +42,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		case NL: 
 			this.obj = Client.lock_read(id);
+			lock = RLT;
 			break;
 		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
 			lock = RLT;
@@ -76,8 +77,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 			break;
 		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
-			// obj = Client.lock_write(id); // Retrieve object
-			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
+			obj = Client.lock_write(id); // Retrieve object - server call
+			lock = WLT; // A 
 			break;
 		case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
 			lock = WLT;
