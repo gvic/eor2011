@@ -141,6 +141,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 		
 		try {
 			// Création du serveur de nom - rmiregistry
+			@SuppressWarnings("unused")
 			Registry registry = LocateRegistry.createRegistry(port);
 
 			// Création d'un serveur
