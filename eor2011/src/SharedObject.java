@@ -33,98 +33,97 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_read() {
 		
-		synchronized(this){
-			switch(lock){
-			
-			/* On fait un switch pour tout les etats de 
-			 * lock pour l'instant, pour bien visualiser tous les cas.
-			 */
-			
-			case NL: 
-				this.obj = Client.lock_read(id);
-				lock = RLT;
-				break;
-			case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
-				lock = RLT;
-				break;
-			case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
-				lock = RLT_WLC;
-				break;
-			case RLT: /* Nothing to do */
-				break;
-			case WLT: /* Warn the user, he has to unlock the WL himself */
-				System.out.println("You had not release the write lock");
-				break;
-			case RLT_WLC:
-				break;
-			
-			default: break;
-			
-			}
+
+		switch(lock){
+		
+		/* On fait un switch pour tout les etats de 
+		 * lock pour l'instant, pour bien visualiser tous les cas.
+		 */
+		
+		case NL: 
+			this.obj = Client.lock_read(id);
+			lock = RLT;
+			break;
+		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
+			lock = RLT;
+			break;
+		case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
+			lock = RLT_WLC;
+			break;
+		case RLT: /* Nothing to do */
+			break;
+		case WLT: /* Warn the user, he has to unlock the WL himself */
+			System.out.println("You had not release the write lock");
+			break;
+		case RLT_WLC:
+			break;
+		
+		default: break;
+		
 		}
 	}
 	
 	// invoked by the user program on the client node
 	public void lock_write() {
-		synchronized(this){
-			switch(lock){
-			
-			/* On fait un switch pour tout les etats de 
-			 * lock pour l'instant, pour bien visualiser tous les cas.
-			 */
-			
-			case NL: 
-				obj = Client.lock_write(id); // Retrieve object
-				lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
-				break;
-			case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
-				obj = Client.lock_write(id); // Retrieve object - server call
-				lock = WLT; // A 
-				break;
-			case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
-				lock = WLT;
-				break;
-			case RLT: /* The client cannot switch directly into WLT state from RLT state */
-				System.out.println("You have to remove the reader lock before using a write lock.");
-				break;
-			case WLT: /* Nothing to do */
-				break;
-			case RLT_WLC: 
-				lock = WLT;
-				break;
-			
-			default: break;
-			
-			}
+		
+		switch(lock){
+		
+		/* On fait un switch pour tout les etats de 
+		 * lock pour l'instant, pour bien visualiser tous les cas.
+		 */
+		
+		case NL: 
+			obj = Client.lock_write(id); // Retrieve object
+			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
+			break;
+		case RLC: /* The lock had been cached, it's useless to make a request to Client layer */
+			obj = Client.lock_write(id); // Retrieve object - server call
+			lock = WLT; // A 
+			break;
+		case WLC: /* The WL is stronger than RL, we don't need to call Client layer */
+			lock = WLT;
+			break;
+		case RLT: /* The client cannot switch directly into WLT state from RLT state */
+			System.out.println("You have to remove the reader lock before using a write lock.");
+			break;
+		case WLT: /* Nothing to do */
+			break;
+		case RLT_WLC: 
+			lock = WLT;
+			break;
+		
+		default: break;
+		
 		}
+
 	}
 
 	// invoked by the user program on the client node
 	public synchronized void unlock() {
-		synchronized(this){
-			switch(lock){
-			
-			/* On fait un switch pour tout les etats de 
-			 * lock pour l'instant, pour bien visualiser tous les cas.
-			 */
-			
-			case NL: break;
-			case RLC: break;
-			case WLC: break;
-			case RLT: /* We cached the read lock */ 
-				lock = RLC;
-				break;
-			case WLT: /* We cached the write lock */
-				lock = WLC;
-				break;
-			case RLT_WLC:  /* We get back the WLC state */
-				lock = WLC;
-				break;
-			
-			default: break;
-			
-			}
+		
+		switch(lock){
+		
+		/* On fait un switch pour tout les etats de 
+		 * lock pour l'instant, pour bien visualiser tous les cas.
+		 */
+		
+		case NL: break;
+		case RLC: break;
+		case WLC: break;
+		case RLT: /* We cached the read lock */ 
+			lock = RLC;
+			break;
+		case WLT: /* We cached the write lock */
+			lock = WLC;
+			break;
+		case RLT_WLC:  /* We get back the WLC state */
+			lock = WLC;
+			break;
+		
+		default: break;
+		
 		}
+		
 		this.notify(); // Le sharedObject notifie qu'il a finit son travail
 		
 	}
