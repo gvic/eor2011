@@ -63,6 +63,8 @@ public class StressTest extends Frame {
 			}
 		}
 		
+		System.exit(0);
+		
 	}
 
 	
@@ -102,19 +104,21 @@ public class StressTest extends Frame {
 			Iterator<oneClient> oc = this.clients.iterator();
 			int j = 0;
 			while (oc.hasNext()) {
+				oneClient one = oc.next();
 				j++;
 				for (int i=0; i<this.nbObj; i++) {
-					System.out.println("Client "+j+", object "+i+" is : "+oc.next().read(i));					
+					System.out.println("Client "+j+", object "+i+" is : "+one.read(i));					
 				}
 			}
 			break;
 		case WRITE:
 			Iterator<oneClient> occ = this.clients.iterator();
 			while (occ.hasNext()) {
+				oneClient one = occ.next();
 				for (int k=0; k<this.nbObj; k++) {
 					// 10 incr per object per client
 					for (int kk=0; kk<10; kk++) {
-						occ.next().incr(k);
+						one.incr(k);
 					}
 					
 				}
@@ -123,10 +127,12 @@ public class StressTest extends Frame {
 		case BOTH:
 			Iterator<oneClient> it = this.clients.iterator();
 			while (it.hasNext()) {
+				oneClient one = it.next();
 				for (int k=0; k<this.nbObj; k++) {
 					// 10 incr per object per client
+					
 					for (int kk=0; kk<10; kk++) {
-						it.next().incr(k);
+						one.incr(k);
 					}
 					
 				}
@@ -135,8 +141,9 @@ public class StressTest extends Frame {
 			int jk = 0;
 			while (ite.hasNext()) {
 				jk++;
+				oneClient one = ite.next();
 				for (int i=0; i<this.nbObj; i++) {
-					System.out.println("Client "+jk+", object "+i+" is : "+ite.next().read(i));					
+					System.out.println("Client "+jk+", object "+i+" is : "+one.read(i));					
 				}
 			}
 			break;
