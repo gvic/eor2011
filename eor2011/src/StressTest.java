@@ -10,65 +10,137 @@ import java.rmi.registry.*;
 
 public class StressTest extends Frame {
 	
-	public static int num;
+	private static final int READ = 0;
+
+	private static final int WRITE = 1;
+
+	private static final int BOTH = 2;
+
+	public static int num = 0;
 	
-	//	public TextArea		text;
-	public TextField	nbClients;
-	public TextField	nbObjects;
+	// Related Integers
+	public int nbCl;
+	public int nbObj;
+	
+	public int mode;
 	
 	ArrayList<oneClient>	clients = new ArrayList<oneClient>();
 
 	public static void main(String argv[]) {
+		
+		if (argv.length < 1) {
+			System.out.println("cd");
+			System.exit(0);
+		} else {
+			try {
+				int m =0;
+				if (argv[2].equals("write")) {
+					m = WRITE;
+				} else {
+					if (argv[2].equals("read")){
+						m = READ;
+					} else {
+						if (argv[2].equals("both")){
+							m = BOTH;
+						} else {
+							System.out.println("Usage: java "+StressTest.class.getName()+" <#clients> [<#objects>] [read|write|both]");
+							System.exit(0);
+						}
+					}
+				}
 				
-//		// initialize the system
-//		Client.init();
-//		
-//		// look up the IRC object in the name server
-//		// if not found, create it, and register it in the name server
-//		SharedObject s = Client.lookup("IRC");
-//		if (s == null) {
-//			s = Client.create(new Sentence());
-//			Client.register("IRC", s);
-//		}
-		// create the graphical part
-		new StressTest();
+				new StressTest(Integer.parseInt(argv[0]), Integer.parseInt(argv[1]), m);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				try {
+					new StressTest(Integer.parseInt(argv[0]), Integer.parseInt(argv[1]));
+				} catch (ArrayIndexOutOfBoundsException ex) {
+					new StressTest(Integer.parseInt(argv[0]));
+				}
+			} catch (NumberFormatException exc) {
+				exc.printStackTrace();
+				System.out.println("Usage: java "+StressTest.class.getName()+" <#clients> [<#objects>] [read|write|both]");
+				System.exit(0);
+			}
+		}
+		
 	}
 
-	public StressTest() {
 	
-		setLayout(new FlowLayout());
-	
-//		text=new TextArea(10,60);
-//		text.setEditable(false);
-//		text.setForeground(Color.red);
-//		add(text);
-	
-		TextArea ta1 = new TextArea("Nombre d'objects",1,16,TextArea.SCROLLBARS_NONE);
-		TextArea ta2 = new TextArea("Nombre de clients",1,17,TextArea.SCROLLBARS_NONE);
-		ta1.setEditable(false);
-		ta2.setEditable(false);
+	public StressTest(int nbClts) {
+		this.nbCl = nbClts;
+		this.nbObj = 1;
+		this.mode = WRITE;	
 		
-		
-		add(ta2);
-		nbClients=new TextField(6);
-		add(nbClients);
+		next();
+	}
+	
+	public StressTest(int nbClts, int nbObjs) {
+		this.nbCl = nbClts;
+		this.nbObj = nbObjs;
+		this.mode = WRITE;
 
-		
-		add(ta1);
-		nbObjects =new TextField(6);
-		add(nbObjects);
+		next();
+	}
 	
-		Button set_button = new Button("Set");
-		set_button.addActionListener(new setListener(this));
-		add(set_button);
-		Button launch_button = new Button("Launch!");
-		launch_button.addActionListener(new launchListener(this));
-		add(launch_button);
+	public StressTest(int nbClts, int nbObjs, int m) {
+		this.nbCl = nbClts;
+		this.nbObj = nbObjs;
+		this.mode = m;
 		
-		setSize(500,100);
-//		text.setBackground(Color.black); 
-		show();
-
+		next();
+	}
+	
+	public void next() {
+		for (int j=0; j<this.nbCl; j++) {
+			// Create each clients
+			oneClient oc = new oneClient(this.nbObj, this);
+			this.clients.add(oc);
+		}	
+		
+		switch(this.mode) {
+		case READ:
+			Iterator<oneClient> oc = this.clients.iterator();
+			int j = 0;
+			while (oc.hasNext()) {
+				j++;
+				for (int i=0; i<this.nbObj; i++) {
+					System.out.println("Client "+j+", object "+i+" is : "+oc.next().read(i));					
+				}
+			}
+			break;
+		case WRITE:
+			Iterator<oneClient> occ = this.clients.iterator();
+			while (occ.hasNext()) {
+				for (int k=0; k<this.nbObj; k++) {
+					// 10 incr per object per client
+					for (int kk=0; kk<10; kk++) {
+						occ.next().incr(k);
+					}
+					
+				}
+			}
+			break;
+		case BOTH:
+			Iterator<oneClient> it = this.clients.iterator();
+			while (it.hasNext()) {
+				for (int k=0; k<this.nbObj; k++) {
+					// 10 incr per object per client
+					for (int kk=0; kk<10; kk++) {
+						it.next().incr(k);
+					}
+					
+				}
+			}
+			Iterator<oneClient> ite = this.clients.iterator();
+			int jk = 0;
+			while (ite.hasNext()) {
+				jk++;
+				for (int i=0; i<this.nbObj; i++) {
+					System.out.println("Client "+jk+", object "+i+" is : "+ite.next().read(i));					
+				}
+			}
+			break;
+		}
 	}
 }
 
@@ -80,30 +152,12 @@ class launchListener implements ActionListener {
 		st = i;
 	}
 	public void actionPerformed (ActionEvent e) {
-				
-	}
-}
-
-class setListener implements ActionListener {
-	StressTest st;
-	public setListener (StressTest i) {
-        	st = i;
-	}
-	public void actionPerformed (ActionEvent e) {
-		try {
-			// get the value of nbClients
-			int nbClt = Integer.parseInt(st.nbClients.getText());
-			// get the value of nbObjects
-			int nbObj = Integer.parseInt(st.nbObjects.getText());
-
-			for (int j=0; j<nbClt; j++) {
-				// Create each clients
-				oneClient oc = new oneClient(nbObj, st);
-				st.clients.add(oc);
-			}			
-		} catch (NumberFormatException ex) {
-			ex.printStackTrace();
-		}
+		Iterator<oneClient> oc = st.clients.iterator();
+				while (oc.hasNext()) {
+					for (int i=0; i<st.nbObj; i++) {
+						oc.next().incr(i);
+					}
+				}
 	}
 }
 
@@ -131,11 +185,11 @@ class oneClient {
 			// if not found, create it, and register it in the name server
 			SharedObject s = Client.lookup(i+"");
 			if (s == null) {
-				s = Client.create(new Sentence());
-				System.out.println("sentence n°"+i+" created.");
+				s = Client.create(new Entier());
+				System.out.println("Entier n°"+i+" created.");
 				Client.register(i+"", s);
 			} else {
-				System.out.println("sentence n°"+i+" retrieved from server.");
+				System.out.println("Entier n°"+i+" retrieved from server.");
 			}
 			
 			
@@ -143,24 +197,24 @@ class oneClient {
 		}
 	}
 	
-	public void write(String txt, int objNum) {
+	public void incr(int objNum) {
     	// lock the object in write mode
 		objects.get(objNum).lock_write();
 		
 		// invoke the method
-		((Sentence)(objects.get(objNum).obj)).write(txt);
+		((Entier)(objects.get(objNum).obj)).incrementer();
 		
 		// unlock the object
 		objects.get(objNum).unlock();	
 	}
 	
-	public String read(int objNum) {
+	public Integer read(int objNum) {
 		
 		// lock the object in read mode
 		objects.get(objNum).lock_read();
 		
 		// invoke the method
-		String s = ((Sentence)(objects.get(objNum).obj)).read();
+		Integer s = ((Entier)(objects.get(objNum).obj)).read();
 		
 		// unlock the object
 		objects.get(objNum).unlock();
