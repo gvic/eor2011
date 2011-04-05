@@ -124,7 +124,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		}
 		
-		this.notify(); // Le sharedObject notifie qu'il a finit son travail
+		notify(); // Le sharedObject notifie qu'il a finit son travail
 		
 	}
 
@@ -140,7 +140,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			default: 						break;
 		}
 		
-		// Peut etre faut-il mettre un notify selon la valeur du lock ici ?? -> diapo 28 slides
 		notify();
 		
 		return obj;		
@@ -157,6 +156,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			default: 						break;
 		}
 		
+		notify();
+		
 	}
 
 	public synchronized Object invalidate_writer() {
@@ -169,6 +170,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			default: 						break;
 		
 		}
+		
+		notify();
 		
 		return obj;	
 	}
