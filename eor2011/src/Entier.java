@@ -12,6 +12,15 @@ public class Entier implements java.io.Serializable {
 	public void incrementer() {
 		data++;
 	}
+	
+	public void decrementer() {
+		data--;
+	}
+	
+	public void raz() {
+		data = 0;
+	}
+	
 	public Integer read() {
 		return data;	
 	}

@@ -4,12 +4,12 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	
 	
 	private static final long serialVersionUID = 1L;
-	private static final int NL = 0; // NL : 0 : no local lock
-	private static final int RLC = 1; // RLC : 1 : read lock cached (not taken)
-	private static final int WLC = 2; // WLC : 2 : write lock cached
-	private static final int RLT = 3; // RLT : 3 : read lock taken
-	private static final int WLT = 4; // WLT : 4 : write lock taken
-	private static final int RLT_WLC = 5; // RLT_WLC : 5 : read lock taken and write lock cache
+	static final int NL = 0; // NL : 0 : no local lock
+	static final int RLC = 1; // RLC : 1 : read lock cached (not taken)
+	static final int WLC = 2; // WLC : 2 : write lock cached
+	static final int RLT = 3; // RLT : 3 : read lock taken
+	static final int WLT = 4; // WLT : 4 : write lock taken
+	static final int RLT_WLC = 5; // RLT_WLC : 5 : read lock taken and write lock cache
 	
 	// The object
 	public Object obj;
@@ -197,4 +197,33 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		return this.obj;
 	}
 	
+	static public String lockToString(int l) {
+		String lock = "";
+		
+		switch(l){
+		case SharedObject.NL: 
+			lock = "NL";
+			break;
+		case SharedObject.RLC:
+			lock = "RLC";
+			break;
+		case SharedObject.WLC: 
+			lock = "WLC";
+			break;
+		case SharedObject.RLT:
+			lock = "RLT";
+			break;
+		case SharedObject.WLT: 
+			lock = "WLT";
+			break;
+		case SharedObject.RLT_WLC:
+			lock = "RLT_WLC";
+			break;
+		
+		default: break;
+		
+		}
+		
+		return lock;
+	}
 }
