@@ -16,7 +16,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// Object id 
 	public int id;
 	// The lock
-	public int lock;       
+	public int lock;
+	private boolean callback_processing;       
 	
 	// Default constructor : start with No Lock
 	public SharedObject() {
@@ -28,18 +29,21 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		this();
 		obj = o;
 		id = i;	
+		callback_processing = false;
 	}
 	
 	// invoked by the user program on the client node
 	public void lock_read() {
 		
+		if(callback_processing){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 
 		switch(lock){
-		
-		/* On fait un switch pour tout les etats de 
-		 * lock pour l'instant, pour bien visualiser tous les cas.
-		 */
-		
 		case NL: 
 			this.obj = Client.lock_read(id);
 			lock = RLT;
@@ -66,12 +70,15 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_write() {
 		
+		if(callback_processing){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		switch(lock){
-		
-		/* On fait un switch pour tout les etats de 
-		 * lock pour l'instant, pour bien visualiser tous les cas.
-		 */
-		
 		case NL: 
 			obj = Client.lock_write(id); // Retrieve object
 			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
@@ -100,13 +107,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 	// invoked by the user program on the client node
 	public synchronized void unlock() {
-		
+
 		switch(lock){
-		
-		/* On fait un switch pour tout les etats de 
-		 * lock pour l'instant, pour bien visualiser tous les cas.
-		 */
-		
 		case NL: break;
 		case RLC: break;
 		case WLC: break;
@@ -125,12 +127,13 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		}
 		
 		notify(); // Le sharedObject notifie qu'il a finit son travail
-		
 	}
 
 
 	// callback invoked remotely by the server
 	public synchronized Object reduce_lock() {
+		
+		this.callback_processing = true;
 		
 		switch(lock){  
 			/* Se reporter au diagramme d'états diapo 27 des slides */
@@ -142,12 +145,17 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		notify();
 		
+		// Des qu'on a émis le notify on peut mettre le booleen unlock_processing a false
+		this.callback_processing = false;
+		
 		return obj;		
 	}
 	
 
 	// callback invoked remotely by the server
 	public synchronized void invalidate_reader() {
+		
+		this.callback_processing = true;
 		
 		switch(lock){  
 			/* Se reporter au diagramme d'états diapo 27 des slides */
@@ -158,10 +166,13 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		
 		notify();
 		
+		this.callback_processing = false;
 	}
 
 	public synchronized Object invalidate_writer() {
 
+		this.callback_processing = true;
+		
 		switch(lock){
 			/* Se reporter au diagramme d'états diapo 27 des slides */
 			case WLC: 		lock = NL;		break;
@@ -172,7 +183,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		}
 		
 		notify();
-		
+		this.callback_processing = false;
 		return obj;	
 	}
 
