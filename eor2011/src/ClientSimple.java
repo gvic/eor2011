@@ -67,9 +67,12 @@ public class ClientSimple extends Frame {
 		Button lire_button = new Button("Read");
 		lire_button.addActionListener(new lireListener(this));
 		add(lire_button);
+		Button pause_button = new Button("Pause");
+		pause_button.addActionListener(new pauseListener(this));
+		add(pause_button);
 		
 		
-		setSize(350,100);
+		setSize(400,100);
 		
 		show();
 				
