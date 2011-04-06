@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 public class ClientSimple extends Frame {
 
 	private static final long serialVersionUID = 1L;
-	static boolean stop = false;
+	boolean stop = false;
 
 	SharedObject entier;
 	boolean init;
@@ -72,7 +72,7 @@ public class ClientSimple extends Frame {
 		add(pause_button);
 		
 		
-		setSize(400,100);
+		setSize(450,150);
 		
 		show();
 				
@@ -105,7 +105,7 @@ class pauseListener implements ActionListener{
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		ClientSimple.stop = true;
+		simple.stop = true;
 	}
 	
 }
@@ -118,7 +118,7 @@ class repriseListener implements ActionListener{
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		ClientSimple.stop = false;
+		simple.stop = false;
 	}
 	
 }
@@ -131,7 +131,7 @@ class razListener extends myActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		ClientSimple.stop = true;
+		simple.stop = true;
     	// lock the object in write mode
 		simple.entier.lock_write();
 		
@@ -153,7 +153,7 @@ class lireListener extends myActionListener  {
 	@Override
 	public void actionPerformed (ActionEvent e) {
 		super.actionPerformed(e);
-		ClientSimple.stop = false;
+		simple.stop = false;
 		Thread t = new Thread(new lireRunnableTask(simple));
 		t.start();	
 	}
@@ -167,7 +167,7 @@ class lireRunnableTask implements Runnable{
 	}
 	@Override
 	public void run() {
-		while(!ClientSimple.stop){
+		while(!client.stop){
 			// lock the object in read mode
 			client.entier.lock_read();
 			
@@ -190,7 +190,7 @@ class incListener extends myActionListener  {
 	}
 	public void actionPerformed (ActionEvent e) {  
 		super.actionPerformed(e);
-		ClientSimple.stop = false;
+		simple.stop = false;
 		Thread t = new Thread(new incRunnableTask(simple));
 		t.start();		
 	}
@@ -205,7 +205,7 @@ class incRunnableTask implements Runnable{
 	}
 	@Override
 	public void run() {
-		while(!ClientSimple.stop){
+		while(!client.stop){
         	// lock the object in write mode
 			client.entier.lock_write();
 			
@@ -226,7 +226,7 @@ class decListener extends myActionListener  {
 	}
 	public void actionPerformed (ActionEvent e) {  
 		super.actionPerformed(e);
-		ClientSimple.stop = false;
+		simple.stop = false;
 		Thread t = new Thread(new decRunnableTask(simple));
 		t.start();	
 	}
@@ -240,7 +240,7 @@ class decRunnableTask implements Runnable{
 	}
 	@Override
 	public void run() {
-		while(!ClientSimple.stop){
+		while(!client.stop){
 		    	// lock the object in write mode
 			client.entier.lock_write();
 			
