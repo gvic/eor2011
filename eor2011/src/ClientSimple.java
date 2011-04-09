@@ -1,23 +1,30 @@
-import java.awt.Button;
 import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.TextArea;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
 
-public class ClientSimple extends Frame {
+
+public class ClientSimple extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	boolean stop = false;
+	static final int STOP = 0;
+	static final int INC = 1;
+	static final int DEC = 2;
+	static final int READ = 3;	
+	static final int RAZ = 4;	
+	
 
 	SharedObject entier;
-	boolean init;
 	
-	TextArea lock;
-	TextArea valeur;
+	JTextArea lock;
+	JTextArea value;
+	JTextArea comment;
 	
+	int state = STOP;
 	
 	public static void main(String argv[]) {
 
@@ -33,92 +40,144 @@ public class ClientSimple extends Frame {
 		}
 		
 		// create the graphical part
-		new ClientSimple(s);
+		ClientSimple one = new ClientSimple(s);
+		
+		boolean end = false;
+		// The main loop
+		while (!end) {
+			// Show the lock state
+			one.lock.setText(SharedObject.lockToString(one.entier.lock));
+			
+			// What to do?
+			switch (one.state) {
+			case STOP:
+				one.comment.setText("I am stopped!");
+				break;
+			case INC:				
+				one.comment.setText("Ask the lock_write");
+				// lock the object in write mode
+				one.entier.lock_write();
+				one.comment.setText("Got the lock_write");
+				
+				// invoke the method
+				((Entier)(one.entier.obj)).incrementer();
+				
+				one.comment.setText("Ask the unlock");
+				// unlock the object
+				one.entier.unlock();
+				one.comment.setText("Got the unlock");				
+				break;
+			case DEC:
+				one.comment.setText("Ask the lock_write");
+				// lock the object in write mode
+				one.entier.lock_write();
+				one.comment.setText("Got the lock_write");
+				
+				// invoke the method
+				((Entier)(one.entier.obj)).decrementer();
+				
+				one.comment.setText("Ask the unlock");
+				// unlock the object
+				one.entier.unlock();
+				one.comment.setText("Got the unlock");					
+				break;
+			case READ:			
+				
+				one.comment.setText("Ask the lock_read");
+				// lock the object in read mode
+				one.entier.lock_read();
+				one.comment.setText("Got the lock_read");
+				
+				// invoke the method
+				Integer val = ((Entier)(one.entier.obj)).read();
+				// Show the value 
+				one.value.setText(val+"");
+				
+				one.comment.setText("Ask the unlock");
+				// unlock the object
+				one.entier.unlock();
+				one.comment.setText("Got the unlock");
+
+				break;
+			case RAZ:
+				one.comment.setText("Ask the lock_write");
+				// lock the object in write mode
+				one.entier.lock_write();
+				one.comment.setText("Got the lock_write");
+				
+				// invoke the method
+				((Entier)(one.entier.obj)).raz();
+				
+				one.comment.setText("Ask the unlock");
+				// unlock the object
+				one.entier.unlock();
+				one.comment.setText("Got the unlock");
+				
+				one.state = ClientSimple.STOP;
+				break;			
+			}
+		}
 	}
 
 	@SuppressWarnings("deprecation")
 	public ClientSimple(SharedObject s) {
-		entier = s;		
-		init = true;
-	
-		setLayout(new FlowLayout());
+		entier = s;
+		
+		setLayout(new GridLayout(2,4));
 
-		lock = new TextArea("",3,8,TextArea.SCROLLBARS_NONE);
+		lock = new JTextArea("",3,8);
 		lock.setEditable(false);
 		lock.setForeground(Color.red);
 		lock.setBackground(Color.black);
 		add(lock);
 		
-		valeur =new TextArea("",3,8,TextArea.SCROLLBARS_NONE);
-		valeur.setEditable(false);
-		valeur.setForeground(Color.green);
-		valeur.setBackground(Color.black);
-		add(valeur);
+		value =new JTextArea("",3,8);
+		value.setEditable(false);
+		value.setForeground(Color.green);
+		value.setBackground(Color.black);
+		add(value);
+		
+		comment =new JTextArea("",3,8);
+		comment.setEditable(false);
+		comment.setForeground(Color.blue);
+		comment.setBackground(Color.black);
+		add(comment);
 	
-		Button inc_button = new Button("Inc");
-		inc_button.addActionListener(new incListener(this));
-		add(inc_button);
-		Button dec_button = new Button("Dec");
-		dec_button.addActionListener(new decListener(this));
-		add(dec_button);
-		Button raz_button = new Button("Raz");
-		raz_button.addActionListener(new razListener(this));
-		add(raz_button);
-		Button lire_button = new Button("Read");
-		lire_button.addActionListener(new lireListener(this));
-		add(lire_button);
-		Button pause_button = new Button("Pause");
+		JButton pause_button = new JButton("Pause");
 		pause_button.addActionListener(new pauseListener(this));
 		add(pause_button);
 		
+		JButton inc_button = new JButton("Inc");
+		inc_button.addActionListener(new incListener(this));
+		add(inc_button);
+		JButton dec_button = new JButton("Dec");
+		dec_button.addActionListener(new decListener(this));
+		add(dec_button);
+		JButton raz_button = new JButton("Raz");
+		raz_button.addActionListener(new razListener(this));
+		add(raz_button);
+		JButton lire_button = new JButton("Read");
+		lire_button.addActionListener(new lireListener(this));
+		add(lire_button);
+
 		
-		setSize(450,150);
 		
+		setSize(600,100);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		show();
-				
-		Thread updateLock = new Thread(new updateLock(this));
-		updateLock.start();
 		
 	}
 }
 
-class updateLock implements Runnable {
-	ClientSimple simple;
-	public updateLock(ClientSimple cs) {
-		this.simple = cs;
-	}
-	@Override
-	public void run() {
-		while (true) {
-			if (!simple.init) {
-				simple.lock.setText(SharedObject.lockToString(simple.entier.lock));
-			}
-		}
-	}
-}
-
-class pauseListener implements ActionListener{
+class pauseListener extends myActionListener{
 	
-	ClientSimple simple;
 	public pauseListener(ClientSimple c){
-		this.simple = c;
+		super(c);
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		simple.stop = true;
-	}
-	
-}
-
-class repriseListener implements ActionListener{
-	
-	ClientSimple simple;
-	public repriseListener(ClientSimple c){
-		this.simple = c;
-	}
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		simple.stop = false;
+		super.actionPerformed(e);
+		simple.state = ClientSimple.STOP;
 	}
 	
 }
@@ -126,20 +185,11 @@ class repriseListener implements ActionListener{
 class razListener extends myActionListener {
 	public razListener (ClientSimple i) {
 		super(i);
-		simple = i;
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		simple.stop = true;
-    	// lock the object in write mode
-		simple.entier.lock_write();
-		
-		// invoke the method
-		((Entier)(simple.entier.obj)).raz();
-		
-		// unlock the object
-		simple.entier.unlock();
+		simple.state = ClientSimple.RAZ;
 	}
 
 	
@@ -148,111 +198,36 @@ class razListener extends myActionListener {
 class lireListener extends myActionListener  {
 	public lireListener (ClientSimple i) {
 		super(i);
-		simple = i;
 	}
 	@Override
 	public void actionPerformed (ActionEvent e) {
 		super.actionPerformed(e);
-		simple.stop = false;
-		Thread t = new Thread(new lireRunnableTask(simple));
-		t.start();	
-	}
-}
+		simple.state = ClientSimple.READ;
 
-class lireRunnableTask implements Runnable{
-
-	private ClientSimple client;
-	public lireRunnableTask(ClientSimple c) {
-		this.client = c;
 	}
-	@Override
-	public void run() {
-		while(!client.stop){
-			// lock the object in read mode
-			client.entier.lock_read();
-			
-			// invoke the method
-			Integer s = ((Entier)(client.entier.obj)).read();
-			
-			client.valeur.setText(""+s);
-			
-			// unlock the object
-			client.entier.unlock();
-			}
-	}
-	
 }
 
 class incListener extends myActionListener  {
 	public incListener (ClientSimple i) {
 		super(i);
-    	simple = i;
 	}
 	public void actionPerformed (ActionEvent e) {  
 		super.actionPerformed(e);
-		simple.stop = false;
-		Thread t = new Thread(new incRunnableTask(simple));
-		t.start();		
+		simple.state = ClientSimple.INC;
 	}
 }
 
-
-class incRunnableTask implements Runnable{
-
-	private ClientSimple client;
-	public incRunnableTask(ClientSimple c) {
-		this.client = c;
-	}
-	@Override
-	public void run() {
-		while(!client.stop){
-        	// lock the object in write mode
-			client.entier.lock_write();
-			
-			// invoke the method
-			((Entier)(client.entier.obj)).incrementer();
-		
-			// unlock the object
-			client.entier.unlock();
-		}
-	}
-	
-}
 
 class decListener extends myActionListener  {
 	public decListener (ClientSimple i) {
 		super(i);
-    	simple = i;
 	}
 	public void actionPerformed (ActionEvent e) {  
 		super.actionPerformed(e);
-		simple.stop = false;
-		Thread t = new Thread(new decRunnableTask(simple));
-		t.start();	
+		simple.state = ClientSimple.DEC;
 	}
 }
 
-class decRunnableTask implements Runnable{
-
-	private ClientSimple client;
-	public decRunnableTask(ClientSimple c) {
-		this.client = c;
-	}
-	@Override
-	public void run() {
-		while(!client.stop){
-		    	// lock the object in write mode
-			client.entier.lock_write();
-			
-			// invoke the method
-			((Entier)(client.entier.obj)).decrementer();
-						
-			// unlock the object
-			client.entier.unlock();
-			}
-	}
-	
-}
 
 abstract class myActionListener implements ActionListener {
 	ClientSimple simple;
@@ -262,10 +237,7 @@ abstract class myActionListener implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("test");
-		if (simple.init) {
-			simple.init = false;
-		}
+		System.out.println("Clicked!");
 	}
 }
 
