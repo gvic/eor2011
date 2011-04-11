@@ -155,17 +155,19 @@ public class SharedObject implements Serializable, SharedObject_itf {
 						e.printStackTrace();
 					}
 				}
-				
+				if(lock == WLC){
+					lock = RLC;
+				}
 				break;
 				
 			case RLT_WLC:	lock = RLT;		break;  	
 			default: 						break;
 		}
 		
-		notify();
-		
 		// Des qu'on a émis le notify on peut mettre le booleen unlock_processing a false
 		this.callback_processing = false;
+		
+		notify();
 		
 		return obj;		
 	}
@@ -188,13 +190,17 @@ public class SharedObject implements Serializable, SharedObject_itf {
 						e.printStackTrace();
 					}
 				}
+				if(lock==RLC){
+					lock = NL;
+				}
 				break;   	
 			default: 						break;
 		}
 		
+		this.callback_processing = false;
+
 		notify();
 		
-		this.callback_processing = false;
 	}
 
 	public synchronized Object invalidate_writer() {
@@ -213,7 +219,14 @@ public class SharedObject implements Serializable, SharedObject_itf {
 						e.printStackTrace();
 					}
 				}
-				break;		
+				/** Si un unlock() a reveillé le wait, on est passé en WLC
+				 * Mais vu qu'on invalide les incrvains il faut positionner le
+				 * lock a NL
+				 */
+				if (lock == WLC){
+					lock = NL;
+				}
+				break;
 			case RLT_WLC:	lock = NL;		break;  	
 			default: 						break;
 		
