@@ -52,10 +52,10 @@ public class ServerObject implements Serializable, ServerObject_itf {
 			}
 			// L'ancien écrivain devient lecteur
 			readerClients.add(writerClient);			
-			// L'ancien écrivain n'existe plus!
-			writerClient = null;
 		}
 		
+		// L'ancien écrivain n'existe plus!
+		writerClient = null;
 		// Le client demandeur est aussi un lecteur
 		readerClients.add(c);
 		// Le verrou passe en mode lecture
