@@ -15,9 +15,8 @@ public class ClientSimple extends JFrame {
 	private static final long serialVersionUID = 1L;
 	static final int STOP = 0;
 	static final int INC = 1;
-	static final int DEC = 2;
-	static final int READ = 3;	
-	static final int RAZ = 4;	
+	static final int READ = 2;	
+	static final int RAZ = 3;	
 
 	SharedObject entier;
 	
@@ -67,20 +66,6 @@ public class ClientSimple extends JFrame {
 				// unlock the object
 				one.entier.unlock();
 				one.comment.setText("Got the unlock");				
-				break;
-			case DEC:
-				one.comment.setText("Ask the lock_write");
-				// lock the object in write mode
-				one.entier.lock_write();
-				one.comment.setText("Got the lock_write");
-				
-				// invoke the method
-				((Entier)(one.entier.obj)).decrementer();
-				
-				one.comment.setText("Ask the unlock");
-				// unlock the object
-				one.entier.unlock();
-				one.comment.setText("Got the unlock");					
 				break;
 			case READ:			
 				
@@ -159,9 +144,6 @@ public class ClientSimple extends JFrame {
 		JButton inc_button = new JButton("Inc");
 		inc_button.addActionListener(new incListener(this));
 		add(inc_button);
-//		JButton dec_button = new JButton("Dec");
-//		dec_button.addActionListener(new decListener(this));
-//		add(dec_button);
 		JButton raz_button = new JButton("Raz");
 		raz_button.addActionListener(new razListener(this));
 		add(raz_button);
@@ -176,6 +158,18 @@ public class ClientSimple extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		show();
 		
+	}
+}
+
+abstract class myActionListener implements ActionListener {
+	ClientSimple simple;
+	public myActionListener(ClientSimple s) {
+		simple = s;
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		System.out.println("Clicked at "+e.getWhen()+", with this action :"+e.getActionCommand()+".");
 	}
 }
 
@@ -226,28 +220,3 @@ class incListener extends myActionListener  {
 		simple.state = ClientSimple.INC;
 	}
 }
-
-
-class decListener extends myActionListener  {
-	public decListener (ClientSimple i) {
-		super(i);
-	}
-	public void actionPerformed (ActionEvent e) {  
-		super.actionPerformed(e);
-		simple.state = ClientSimple.DEC;
-	}
-}
-
-
-abstract class myActionListener implements ActionListener {
-	ClientSimple simple;
-	public myActionListener(ClientSimple s) {
-		simple = s;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		System.out.println("Clicked!");
-	}
-}
-
