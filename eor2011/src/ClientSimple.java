@@ -16,7 +16,6 @@ public class ClientSimple extends JFrame {
 	static final int DEC = 2;
 	static final int READ = 3;	
 	static final int RAZ = 4;	
-	
 
 	SharedObject entier;
 	
@@ -150,9 +149,9 @@ public class ClientSimple extends JFrame {
 		JButton inc_button = new JButton("Inc");
 		inc_button.addActionListener(new incListener(this));
 		add(inc_button);
-		JButton dec_button = new JButton("Dec");
-		dec_button.addActionListener(new decListener(this));
-		add(dec_button);
+//		JButton dec_button = new JButton("Dec");
+//		dec_button.addActionListener(new decListener(this));
+//		add(dec_button);
 		JButton raz_button = new JButton("Raz");
 		raz_button.addActionListener(new razListener(this));
 		add(raz_button);
