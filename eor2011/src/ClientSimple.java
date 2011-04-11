@@ -141,6 +141,13 @@ public class ClientSimple extends JFrame {
 		comment.setForeground(Color.blue);
 		comment.setBackground(Color.black);
 		add(comment);
+		
+		JTextArea jt =new JTextArea("",3,8);
+		jt.setEditable(false);
+		jt.setForeground(Color.black);
+		jt.setBackground(Color.white);
+		jt.setText("ClientSimple");
+		add(jt);
 	
 		JButton pause_button = new JButton("Pause");
 		pause_button.addActionListener(new pauseListener(this));
