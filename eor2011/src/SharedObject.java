@@ -138,7 +138,26 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		switch(lock){  
 			/* Se reporter au diagramme d'états diapo 27 des slides */
 			case WLC: 		lock = RLC;		break;
-			case WLT: 		lock = RLC;		break;		
+			case WLT:
+				/** Il faut faire attention ici : 
+				 * ce n'est pas a nous de passer le lock en RLC,
+				 * c'est le client qui le fera lorsqu'il appelera
+				 * unlock() sur l'objet.
+				 * Seulement a partir de ce moment on pourra appliquer
+				 * le reduce_lock.
+				 * Ce qui justifie l'utilisation du wait() puisque unlock()
+				 * emet un notify()
+				 */
+				while(lock == WLT){
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				break;
+				
 			case RLT_WLC:	lock = RLT;		break;  	
 			default: 						break;
 		}
