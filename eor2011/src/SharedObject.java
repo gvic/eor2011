@@ -179,7 +179,16 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		switch(lock){  
 			/* Se reporter au diagramme d'états diapo 27 des slides */
 			case RLC: 		lock = NL;		break;
-			case RLT:	 	lock = NL;		break;   	
+			case RLT:	 
+				/** Meme principe que pour reduce_lock */
+				while(lock == RLT){
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;   	
 			default: 						break;
 		}
 		
@@ -195,7 +204,16 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		switch(lock){
 			/* Se reporter au diagramme d'états diapo 27 des slides */
 			case WLC: 		lock = NL;		break;
-			case WLT: 		lock = NL;		break;		
+			case WLT:
+				/** Meme principe que reduce_lock */
+				while(lock == WLT){
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;		
 			case RLT_WLC:	lock = NL;		break;  	
 			default: 						break;
 		
