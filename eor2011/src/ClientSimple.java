@@ -1,5 +1,7 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -127,32 +129,33 @@ public class ClientSimple extends JFrame {
 		lock = new JTextArea("",3,8);
 		lock.setEditable(false);
 		lock.setForeground(Color.red);
-		lock.setBackground(Color.black);
+		lock.setMargin(new Insets(10, 40, 0, 0));
+		lock.setBackground(Color.DARK_GRAY);
 		add(lock);
 		
 		value =new JTextArea("",3,8);
 		value.setEditable(false);
 		value.setForeground(Color.green);
-		value.setBackground(Color.black);
+		value.setMargin(new Insets(10, 10, 0, 0));
+		value.setBackground(Color.DARK_GRAY);
 		add(value);
 		
 		comment =new JTextArea("",3,8);
 		comment.setEditable(false);
-		comment.setForeground(Color.blue);
-		comment.setBackground(Color.black);
+		comment.setForeground(Color.white);
+		comment.setMargin(new Insets(10, 5, 0, 0));
+		comment.setBackground(Color.DARK_GRAY);
 		add(comment);
 		
 		JTextArea jt =new JTextArea("",3,8);
 		jt.setEditable(false);
 		jt.setForeground(Color.black);
 		jt.setBackground(Color.white);
+		jt.setFont(new Font("Arial", Font.BOLD, 12));
+		jt.setMargin(new Insets(10, 20, 0, 0));
 		jt.setText("ClientSimple");
 		add(jt);
-	
-		JButton pause_button = new JButton("Pause");
-		pause_button.addActionListener(new pauseListener(this));
-		add(pause_button);
-		
+			
 		JButton inc_button = new JButton("Inc");
 		inc_button.addActionListener(new incListener(this));
 		add(inc_button);
@@ -165,8 +168,9 @@ public class ClientSimple extends JFrame {
 		JButton lire_button = new JButton("Read");
 		lire_button.addActionListener(new lireListener(this));
 		add(lire_button);
-
-		
+		JButton pause_button = new JButton("Pause");
+		pause_button.addActionListener(new pauseListener(this));
+		add(pause_button);		
 		
 		setSize(600,100);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
