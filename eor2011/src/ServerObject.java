@@ -22,6 +22,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	//reader Clients
 	private HashSet<Client_itf> readerClients;
 	private Client_itf writerClient;
+	private boolean lock_processing = false;
 	
 	// Default constructor : start with No Lock
 	public ServerObject() {
@@ -42,6 +43,17 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	 */
 	@Override
 	public synchronized Object lock_read(Client_itf c) {
+		
+		if(lock_processing){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		lock_processing  = true;
 		if(lock == WL){
 			try {
 				// On récupère la derniere version de l'objet
@@ -59,6 +71,8 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		readerClients.add(c);
 		// Le verrou passe en mode lecture
 		lock = RL;
+		lock_processing = false;
+		notify();
 		
 		return obj; // On retourne l'objet touché par le dernier écrivain
 	}
@@ -66,6 +80,17 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	@Override
 	public synchronized Object lock_write(Client_itf c) {
 
+		if(lock_processing){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		lock_processing = true;
+		
 		try{
 			switch(lock){
 			case WL:
@@ -91,7 +116,10 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-				
+		
+		lock_processing = false;
+		notify();
+		
 		return obj;  // On retourne l'objet touché par le dernier ecrivain
 	}	
 }

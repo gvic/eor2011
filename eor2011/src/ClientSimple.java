@@ -53,6 +53,7 @@ public class ClientSimple extends JFrame {
 			case STOP:
 				one.comment.setText("I am stopped!");
 				break;
+				
 			case INC:				
 				one.comment.setText("Ask the lock_write");
 				// lock the object in write mode
@@ -67,8 +68,8 @@ public class ClientSimple extends JFrame {
 				one.entier.unlock();
 				one.comment.setText("Got the unlock");				
 				break;
-			case READ:			
 				
+			case READ:			
 				one.comment.setText("Ask the lock_read");
 				// lock the object in read mode
 				one.entier.lock_read();
@@ -83,8 +84,8 @@ public class ClientSimple extends JFrame {
 				// unlock the object
 				one.entier.unlock();
 				one.comment.setText("Got the unlock");
-
 				break;
+				
 			case RAZ:
 				one.comment.setText("Ask the lock_write");
 				// lock the object in write mode
