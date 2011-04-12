@@ -33,7 +33,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	}
 
 	// invoked by the user program on the client node
-	public void lock_read() {
+	public synchronized void lock_read() {
 
 		if (callback_processing) {
 			synchronized (this) {
@@ -77,7 +77,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	}
 
 	// invoked by the user program on the client node
-	public void lock_write() {
+	public synchronized void lock_write() {
 
 		if (callback_processing) {
 			synchronized (this) { // On doit synchronizer car le thread qui passe par la doit etre
