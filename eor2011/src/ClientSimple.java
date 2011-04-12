@@ -15,8 +15,8 @@ public class ClientSimple extends JFrame {
 	private static final long serialVersionUID = 1L;
 	static final int STOP = 0;
 	static final int INC = 1;
-	static final int READ = 2;	
-	static final int RAZ = 3;	
+	static final int READ = 3;	
+	static final int RAZ = 4;	
 
 	SharedObject entier;
 	
@@ -150,13 +150,14 @@ public class ClientSimple extends JFrame {
 		add(raz_button);
 		JButton lire_button = new JButton("Read");
 		lire_button.addActionListener(new lireListener(this));
-		add(lire_button);
+		add(lire_button);		
 		JButton pause_button = new JButton("Pause");
 		pause_button.addActionListener(new pauseListener(this));
 		add(pause_button);		
 		
 		setSize(600,100);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		pack();
 		show();
 		
 	}
