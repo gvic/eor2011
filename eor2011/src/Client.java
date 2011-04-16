@@ -90,10 +90,8 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			so = new SharedObject(o,id);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			System.out.println(e.getCause().toString());
 		} /*finally {
 			System.out.println("Can't create SharedObject because of the server");
-			
 		}	*/	
 		
 		
@@ -143,18 +141,30 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 //		return o.getObj();
 		// It's better to return this statement below, 
 		// all the synchronization verifications are made in the SharedObject class
-		return ((SharedObject) sharedObjectsList.get(id)).reduce_lock();
+		Object o = null;
+		SharedObject_itf so = sharedObjectsList.get(id);
+		if (so != null) {
+			o = so.reduce_lock();
+		}
+		return o;
 	}
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
-		((SharedObject) sharedObjectsList.get(id)).invalidate_reader();
+		SharedObject_itf so = sharedObjectsList.get(id);
+		if (so != null) {
+			so.invalidate_reader();
+		}
 	}
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
-		return ((SharedObject) sharedObjectsList.get(id)).invalidate_writer();
-		//return o.getObj();		
+		Object o = null;
+		SharedObject_itf so = sharedObjectsList.get(id);
+		if (so != null) {
+			o = so.invalidate_writer();
+		}
+		return o;
 	}
 	
 }

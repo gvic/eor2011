@@ -1,11 +1,18 @@
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.TextArea;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
 
 public class Server extends UnicastRemoteObject implements Server_itf {
 
@@ -21,12 +28,16 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	
 	// count number (Integer in order to use locks on this object) 
 	private Integer idCpt = 0;
-	
+
+	private GUI vue;
 	
 	protected Server() throws RemoteException {
 		serverObjectsList =  new Hashtable<String, Pair<Integer,ServerObject_itf>>();
 		notRegisteredServerObject = new Hashtable<Integer, ServerObject_itf>();
 		registeredNames = new HashMap<Integer, String>();
+		
+		vue = new GUI(this);
+		
 	}
 
 	/*
@@ -63,9 +74,10 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 		if(so != null){
 			Pair<Integer, ServerObject_itf> pair = new Pair<Integer, ServerObject_itf>(id, so);
 			serverObjectsList.put(name, pair);
-			registeredNames.put(pair.getFirst(), name);
+			registeredNames.put(id, name);
 			// Alert server admin
 			System.out.println("Object "+id+" registered.");
+			vue.addServerObject(id);
 		}
 		else{
 			System.out.println("Object "+id+" doesn't exist on the Server");
@@ -82,9 +94,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	public int create(Object o) throws RemoteException {
 		int i = -1;
 		
-		synchronized (idCpt) {
-			idCpt++;
-			
+		synchronized (idCpt) {			
 			ServerObject_itf so = new ServerObject(o,idCpt);
 			notRegisteredServerObject.put(idCpt,so);
 			
@@ -92,6 +102,8 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			System.out.println("Object "+idCpt+" created.");	
 			
 			i = this.idCpt;
+			
+			idCpt++;
 		}
 		
 		return i;
@@ -104,8 +116,15 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
-		ServerObject_itf so = serverObjectsList.get(registeredNames.get(id)).getSecond();
-		Object o = so.lock_read(client);
+		Object o = null;
+		try {
+			ServerObject_itf so = serverObjectsList.get(registeredNames.get(id)).getSecond();
+			o = so.lock_read(client);
+			vue.refreshServerObject(id);			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return o;
 	}
 
@@ -116,9 +135,16 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
-		// Il faut pas mettre un synchronized ici sur le lock write ?
-		ServerObject_itf so = serverObjectsList.get(registeredNames.get(id)).getSecond();
-		Object o = so.lock_write(client);
+		Object o = null;
+		
+		try {
+			ServerObject_itf so = serverObjectsList.get(registeredNames.get(id)).getSecond();
+			o = so.lock_write(client);
+			vue.refreshServerObject(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return o;	
 	}
 
@@ -144,7 +170,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			@SuppressWarnings("unused")
 			Registry registry = LocateRegistry.createRegistry(port);
 
-			// Création d'un serveur
+			// Création d'un serveur + GUI
 			Server_itf server = new Server();
 
 			// Calcul de l’URL du serveur
@@ -159,4 +185,46 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			exc.printStackTrace();
 		}
 	}
+	
+	public ServerObject_itf getServerObject(int id) {
+		return serverObjectsList.get(registeredNames.get(id)).getSecond();
+	}
 }
+
+class GUI extends JFrame {
+	/* */
+	private static final long serialVersionUID = 1L;
+	Server server;	
+	
+	ArrayList<JTextArea> sos = new ArrayList<JTextArea>();
+	
+	public GUI (Server s) {
+		server = s;
+		
+		
+		setName("Server");
+		setTitle("Server");
+		setLayout(new GridLayout(3,3));
+
+		setDefaultCloseOperation(EXIT_ON_CLOSE);	
+		setSize(300,300);
+		pack();
+		setVisible(true);
+//		show();
+	}
+
+	public void addServerObject(int n) {
+		ServerObject so = (ServerObject) server.getServerObject(n);
+		JTextArea b = new JTextArea("ServerObject n"+n+". Lock : "+so.lock);
+		b.setEditable(false);
+		add(b);
+		sos.add(b);
+		pack();
+	}
+	
+	public void refreshServerObject(int n) {
+		ServerObject so = (ServerObject) server.getServerObject(n);
+		sos.get(n).setText("ServerObject n"+n+". Lock : "+so.lock);
+	}
+}
+

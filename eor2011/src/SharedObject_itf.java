@@ -9,4 +9,10 @@ public interface SharedObject_itf {
 	public int getId();
 	
 	public Object getObj();
+
+	public Object reduce_lock();
+
+	public void invalidate_reader();
+
+	public Object invalidate_writer();
 }
