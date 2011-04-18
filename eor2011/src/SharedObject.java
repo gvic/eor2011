@@ -199,7 +199,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		// unlock_processing a false
 		this.callback_processing = false;
 
-//		notify();
+		notify();
 
 		return obj;
 	}

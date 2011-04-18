@@ -96,6 +96,8 @@ public class ServerObject implements Serializable, ServerObject_itf {
 				obj = writerClient.invalidate_writer(id); // On invalide le dernier client qui était ecrvain		
 				break;
 			case RL:
+				readerClients.remove(c); // on enleve le dernier writer qui a été mis en tant que lecteur
+										// Pour eviter qu'il s'invalide lui meme...
 				Iterator<Client_itf> clts = readerClients.iterator();
 				while(clts.hasNext()){
 					clts.next().invalidate_reader(id);
