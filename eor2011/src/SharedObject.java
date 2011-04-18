@@ -9,7 +9,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	static final int RLT = 3; // RLT : 3 : read lock taken
 	static final int WLT = 4; // WLT : 4 : write lock taken
 	static final int RLT_WLC = 5; // RLT_WLC : 5 : read lock taken and write
-									// lock cache
+	// lock cache
 
 	// The object
 	public Object obj;
@@ -33,100 +33,110 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	}
 
 	// invoked by the user program on the client node
-	public synchronized void lock_read() {
-
-		if (callback_processing) {
-			// Sure for that?
-			synchronized (this) {
+	public void lock_read() {
+		boolean make_request = false;
+		// Sure for that?
+		synchronized (this) {
+			while (callback_processing) {
 				try {
 					wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
+
+			switch (lock) {
+			case NL:
+				make_request = true;
+				//this.obj = Client.lock_read(id);
+				lock = RLT;
+				break;
+			case RLC: /*
+					 * The lock had been cached, it's useless to make a request
+					 * to Client layer
+					 */
+				lock = RLT;
+				break;
+			case WLC: /*
+					 * The WL is stronger than RL, we don't need to call Client
+					 * layer
+					 */
+				lock = RLT_WLC;
+				break;
+			case RLT: /* Nothing to do */
+				break;
+			case WLT: /* Warn the user, he has to unlock the WL himself */
+				System.out.println("You had not release the write lock");
+				break;
+			case RLT_WLC:
+				break;
+
+			default:
+				break;
+
+			}
 		}
-
-		switch (lock) {
-		case NL:
-			this.obj = Client.lock_read(id);
-			lock = RLT;
-			break;
-		case RLC: /*
-				 * The lock had been cached, it's useless to make a request to
-				 * Client layer
-				 */
-			lock = RLT;
-			break;
-		case WLC: /*
-				 * The WL is stronger than RL, we don't need to call Client
-				 * layer
-				 */
-			lock = RLT_WLC;
-			break;
-		case RLT: /* Nothing to do */
-			break;
-		case WLT: /* Warn the user, he has to unlock the WL himself */
-			System.out.println("You had not release the write lock");
-			break;
-		case RLT_WLC:
-			break;
-
-		default:
-			break;
-
-		}
-	}
+		if(make_request)
+			obj = Client.lock_read(id);
+	}	
 
 	// invoked by the user program on the client node
-	public synchronized void lock_write() {
+	public void lock_write() {
 
-		if (callback_processing) {
-			// Sure for that?
-			synchronized (this) { // On doit synchronizer car le thread qui passe par la doit etre
-							      // le proprietaire du lock sur cette objet pour le wait
+		boolean make_request = false;
+		// Sure for that?
+		synchronized (this) { // On doit synchronizer car le thread qui passe
+			// par la doit etre
+			// le proprietaire du lock sur cette objet pour le wait
+			while (callback_processing) {
 				try {
 					wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
+
+			switch (lock) {
+			case NL:
+				make_request = true;
+				// obj = Client.lock_write(id); // Retrieve object
+				lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
+				break;
+			case RLC: /*
+					 * The lock had been cached, it's useless to make a request
+					 * to Client layer
+					 */
+				make_request = true;
+				// obj = Client.lock_write(id); // Retrieve object - server call
+				lock = WLT; // A
+				break;
+			case WLC: /*
+					 * The WL is stronger than RL, we don't need to call Client
+					 * layer
+					 */
+				lock = WLT;
+				break;
+			case RLT: /*
+					 * The client cannot switch directly into WLT state from RLT
+					 * state
+					 */
+				System.out
+						.println("You have to remove the reader lock before using a write lock.");
+				break;
+			case WLT: /* Nothing to do */
+				break;
+			case RLT_WLC:
+				lock = WLT;
+				break;
+
+			default:
+				break;
+
+			}
 		}
 
-		switch (lock) {
-		case NL:
-			obj = Client.lock_write(id); // Retrieve object
-			lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
-			break;
-		case RLC: /*
-				 * The lock had been cached, it's useless to make a request to
-				 * Client layer
-				 */
-			obj = Client.lock_write(id); // Retrieve object - server call
-			lock = WLT; // A
-			break;
-		case WLC: /*
-				 * The WL is stronger than RL, we don't need to call Client
-				 * layer
-				 */
-			lock = WLT;
-			break;
-		case RLT: /*
-				 * The client cannot switch directly into WLT state from RLT
-				 * state
-				 */
-			System.out
-					.println("You have to remove the reader lock before using a write lock.");
-			break;
-		case WLT: /* Nothing to do */
-			break;
-		case RLT_WLC:
-			lock = WLT;
-			break;
-
-		default:
-			break;
-
-		}
+		if (make_request)
+			obj = Client.lock_write(id);
 
 	}
 
@@ -272,7 +282,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 		}
 		this.callback_processing = false;
-		
+
 		// Sure for that?
 		notify();
 		return obj;

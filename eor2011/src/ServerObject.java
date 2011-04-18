@@ -82,13 +82,13 @@ public class ServerObject implements Serializable, ServerObject_itf {
 
 		if(lock_processing){
 			try {
+				lock_processing = true; // ca rend la transition atomique...
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		lock_processing = true;
 		
 		try{
 			switch(lock){

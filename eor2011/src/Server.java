@@ -135,6 +135,7 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 	 */
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
+		
 		Object o = null;
 		
 		try {
