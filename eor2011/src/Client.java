@@ -131,16 +131,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// SERVER ----> CLIENT
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
-//		SharedObject_itf o = sharedObjectsList.get(id);
-//		try {
-//			o.wait();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		((SharedObject) o).reduce_lock();
-//		return o.getObj();
-		// It's better to return this statement below, 
-		// all the synchronization verifications are made in the SharedObject class
 		Object o = null;
 		SharedObject_itf so = sharedObjectsList.get(id);
 		if (so != null) {

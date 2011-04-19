@@ -45,15 +45,6 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	@Override
 	public synchronized Object lock_read(Client_itf c) {
 		
-		if(lock_processing){
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		lock_processing  = true;
 		if(lock == WL){
 			try {
 				// On récupère la derniere version de l'objet
@@ -71,8 +62,6 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		readerClients.add(c);
 		// Le verrou passe en mode lecture
 		lock = RL;
-		lock_processing = false;
-		notify();
 		
 		return obj; // On retourne l'objet touché par le dernier écrivain
 	}
@@ -80,16 +69,6 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	@Override
 	public synchronized Object lock_write(Client_itf c) {
 
-		if(lock_processing){
-			try {
-				lock_processing = true; // ca rend la transition atomique...
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		
 		try{
 			switch(lock){
 			case WL:
@@ -117,9 +96,6 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		
-		lock_processing = false;
-		notify();
 		
 		return obj;  // On retourne l'objet touché par le dernier ecrivain
 	}	
