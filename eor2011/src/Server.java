@@ -208,7 +208,8 @@ class GUI extends JFrame {
 		setLayout(new GridLayout(4,2));
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);	
-		setSize(1,1);
+//		setSize(1,1);
+		setBounds(300, 300, 10, 10);
 		pack();
 		setVisible(true);
 //		show();
@@ -227,7 +228,7 @@ class GUI extends JFrame {
 	
 	public void refreshServerObject(int n) {
 		ServerObject so = (ServerObject) server.getServerObject(n);
-		sos.get(n).setText("ServerObject n°"+n+". Lock : "+so.lock);
+		sos.get(n).setText("ServerObject n°"+n+".\nLock : "+so.lock);
 	}
 }
 
