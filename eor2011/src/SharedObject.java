@@ -76,6 +76,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 			}
 		}
+		
+		// Les appels server ne doivent pas être bloqué par le synchronised précedent (sur l'objet SharedObject)
 		if(make_request)
 			obj = Client.lock_read(id);
 	}	
