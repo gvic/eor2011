@@ -1,6 +1,6 @@
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.TextArea;
+import java.awt.Insets;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -205,10 +205,10 @@ class GUI extends JFrame {
 		
 		setName("Server");
 		setTitle("Server");
-		setLayout(new GridLayout(3,3));
+		setLayout(new GridLayout(4,2));
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);	
-		setSize(300,300);
+		setSize(1,1);
 		pack();
 		setVisible(true);
 //		show();
@@ -216,8 +216,10 @@ class GUI extends JFrame {
 
 	public void addServerObject(int n) {
 		ServerObject so = (ServerObject) server.getServerObject(n);
-		JTextArea b = new JTextArea("ServerObject n"+n+". Lock : "+so.lock);
+		JTextArea b = new JTextArea("ServerObject n"+n+".\nLock : "+so.lock);
 		b.setEditable(false);
+		b.setFont(new Font("Arial", Font.BOLD, 16));
+		b.setMargin(new Insets(10,10,10,10));
 		add(b);
 		sos.add(b);
 		pack();
@@ -225,7 +227,7 @@ class GUI extends JFrame {
 	
 	public void refreshServerObject(int n) {
 		ServerObject so = (ServerObject) server.getServerObject(n);
-		sos.get(n).setText("ServerObject n"+n+". Lock : "+so.lock);
+		sos.get(n).setText("ServerObject n°"+n+". Lock : "+so.lock);
 	}
 }
 
