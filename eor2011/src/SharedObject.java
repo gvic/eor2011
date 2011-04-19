@@ -35,7 +35,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_read() {
 		boolean make_request = false;
-		// Sure for that?
+		
 		synchronized (this) {
 			while (callback_processing) {
 				try {
@@ -82,9 +82,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 	// invoked by the user program on the client node
 	public void lock_write() {
-
 		boolean make_request = false;
-		// Sure for that?
+
 		synchronized (this) { // On doit synchronizer car le thread qui passe
 			// par la doit etre
 			// le proprietaire du lock sur cette objet pour le wait
@@ -243,7 +242,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 		this.callback_processing = false;
 
-		// Sure for that?
 		notify();
 
 	}
@@ -283,7 +281,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		}
 		this.callback_processing = false;
 
-		// Sure for that?
 		notify();
 		return obj;
 	}
