@@ -104,10 +104,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 				// obj = Client.lock_write(id); // Retrieve object
 				lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 				break;
-			case RLC: /*
-					 * The lock had been cached, it's useless to make a request
-					 * to Client layer
-					 */
+			case RLC: 
 				make_request = true;
 				// obj = Client.lock_write(id); // Retrieve object - server call
 				lock = WLT; // A
