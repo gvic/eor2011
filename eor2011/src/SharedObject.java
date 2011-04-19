@@ -48,7 +48,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			switch (lock) {
 			case NL:
 				make_request = true;
-				//this.obj = Client.lock_read(id);
 				lock = RLT;
 				break;
 			case RLC: /*
@@ -101,7 +100,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			switch (lock) {
 			case NL:
 				make_request = true;
-				// obj = Client.lock_write(id); // Retrieve object
 				lock = WLT; // A VERIFIER SI C'EST A FAIRE ICI
 				break;
 			case RLC: 
