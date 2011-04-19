@@ -277,6 +277,13 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			}
 			break;
 		case RLT_WLC:
+			while (lock == WLT) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 			lock = NL;
 			break;
 		default:
