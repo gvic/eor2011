@@ -83,10 +83,11 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_write() {
 		boolean make_request = false;
-
-		synchronized (this) { // On doit synchronizer car le thread qui passe
+	
+		synchronized (this) { 
+			// On doit synchronizer car le thread qui passe
 			// par la doit etre
-			// le proprietaire du lock sur cette objet pour le wait
+			// le proprietaire du lock sur TOUT l'objet pour le wait
 			while (callback_processing) {
 				try {
 					wait();
@@ -134,6 +135,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			}
 		}
 
+		// Les appels server ne doivent pas être bloqué par le synchronised précedent (sur l'objet SharedObject) 
 		if (make_request)
 			obj = Client.lock_write(id);
 
