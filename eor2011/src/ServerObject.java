@@ -22,14 +22,12 @@ public class ServerObject implements Serializable, ServerObject_itf {
 	//reader Clients
 	private HashSet<Client_itf> readerClients;
 	private Client_itf writerClient;
-	private boolean lock_processing;
 	
 	// Default constructor : start with No Lock
 	public ServerObject() {
 		lock = NL;
 		readerClients = new HashSet<Client_itf>();
 		writerClient = null;
-		lock_processing  = false;
 	}
 	
 	// Constructor used to create a ServerObject
