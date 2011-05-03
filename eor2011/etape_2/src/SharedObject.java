@@ -35,7 +35,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_read() {
 		boolean make_request = false;
-		
+
 		synchronized (this) {
 			while (callback_processing) {
 				try {
@@ -48,7 +48,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			switch (lock) {
 			case NL:
 				make_request = true;
-				//this.obj = Client.lock_read(id);
+				// this.obj = Client.lock_read(id);
 				lock = RLT;
 				break;
 			case RLC: /*
@@ -76,9 +76,9 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 			}
 		}
-		if(make_request)
+		if (make_request)
 			obj = Client.lock_read(id);
-	}	
+	}
 
 	// invoked by the user program on the client node
 	public void lock_write() {

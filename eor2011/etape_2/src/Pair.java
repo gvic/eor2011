@@ -1,12 +1,11 @@
-
 public class Pair<T1, T2> {
 
 	private T1 first;
 	private T2 second;
-	
+
 	public Pair() {
 	}
-	
+
 	public Pair(T1 f, T2 s) {
 		this();
 		setFirst(f);
@@ -28,5 +27,5 @@ public class Pair<T1, T2> {
 	public T2 getSecond() {
 		return second;
 	}
-	
+
 }

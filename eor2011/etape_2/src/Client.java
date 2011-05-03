@@ -10,31 +10,32 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	// The server
 	private static Server_itf server;
 	private static Hashtable<Integer, SharedObject_itf> sharedObjectsList;
-	
+
 	// Instance of the client
 	private static Client_itf myClient;
-	
+
 	public Client() throws RemoteException {
 		super();
 	}
 
-///////////////////////////////////////////////////
-//         Interface to be used by applications
-///////////////////////////////////////////////////
+	// /////////////////////////////////////////////////
+	// Interface to be used by applications
+	// /////////////////////////////////////////////////
 
 	// initialization of the client layer
 	public static void init() {
 		// Lookup for the server in the Naming space
 		try {
-		    int port = 8008;
-		    String URL = "//" + InetAddress.getLocalHost().getHostName() + ":"+port+"/ox";
-		    server = (Server_itf) Naming.lookup(URL);
+			int port = 8008;
+			String URL = "//" + InetAddress.getLocalHost().getHostName() + ":"
+					+ port + "/ox";
+			server = (Server_itf) Naming.lookup(URL);
 		} catch (Exception ex) {
-		    ex.printStackTrace();
-		    System.out.println("Did you launch the server?");
-		    System.exit(0);
+			ex.printStackTrace();
+			System.out.println("Did you launch the server?");
+			System.exit(0);
 		}
-		
+
 		// Create the sharedObjectsList
 		sharedObjectsList = new Hashtable<Integer, SharedObject_itf>();
 		// Instantiate Client object
@@ -44,32 +45,34 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// lookup in the name server
 	public static Object lookup(String name) {
 		int id = -1;
 		SharedObject so = null;
-		
+
 		try {
 			id = server.lookup(name);
 		} catch (RemoteException e) { // Remote problem
 			e.printStackTrace();
-		} catch (Exception ex) { 
+		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.out.println("The object "+ name + " doesn't exist on the server.");
+			System.out.println("The object " + name
+					+ " doesn't exist on the server.");
 		}
-		
-		// Object *name* found on the server (server.lookup() didn't throw an exception)
-		if( id != -1){
+
+		// Object *name* found on the server (server.lookup() didn't throw an
+		// exception)
+		if (id != -1) {
 			// Create local copy of the ServerObject
 			Object o = lock_read(id);
-			so  = instanciateStub(o, id);
+			so = instanciateStub(o, id);
 			sharedObjectsList.put(id, so);
 			so.unlock();
 		}
-		return so;			
-	}		
-	
+		return so;
+	}
+
 	// binding in the name server
 	public static void register(String name, SharedObject_itf so) {
 		try {
@@ -77,37 +80,37 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Add the object to the SharedObjectsList
-		sharedObjectsList.put(so.getId(),so);
+		sharedObjectsList.put(so.getId(), so);
 	}
 
 	// creation of a shared object
 	public static Object create(Object o) {
-	// Create ServerObject in the server
+		// Create ServerObject in the server
 		int id;
 		SharedObject so = null;
 		try {
 			id = server.create(o);
-			so = instanciateStub(o,id);
+			so = instanciateStub(o, id);
 			sharedObjectsList.put(id, so);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			System.out.println(e.getCause().toString());
-		} 		
-		
+		}
+
 		return so;
 	}
-	
-/////////////////////////////////////////////////////////////
-//    Interface to be used by the consistency protocol
-////////////////////////////////////////////////////////////
-	
+
+	// ///////////////////////////////////////////////////////////
+	// Interface to be used by the consistency protocol
+	// //////////////////////////////////////////////////////////
+
 	/* Voir page 3 sujet pour specs */
 
 	// CLIENT ----> SERVER
 	// request a read lock from the server
-	public static Object lock_read(int id) {		
+	public static Object lock_read(int id) {
 		Object o = null;
 		try {
 			o = server.lock_read(id, myClient);
@@ -118,7 +121,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	}
 
 	// request a write lock from the server
-	public static Object lock_write (int id) {
+	public static Object lock_write(int id) {
 		Object o = null;
 		try {
 			o = server.lock_write(id, myClient);
@@ -128,7 +131,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		return o;
 	}
 
-	
 	// SERVER ----> CLIENT
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
@@ -157,22 +159,25 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		}
 		return o;
 	}
-	
-public static SharedObject instanciateStub(Object o, int id) {
-		
+
+	public static SharedObject instanciateStub(Object o, int id) {
+
 		SharedObject so = null;
-		
+
 		try {
-			// Instanciation de la classe x_stub où x représente la classe véritable de o
+			// Instanciation de la classe x_stub où x représente la classe
+			// véritable de o
 			Class<?> classe = Class.forName(o.getClass().getName() + "_stub");
 
-			java.lang.reflect.Constructor<?> constructeur = classe.getConstructor(new Class[] {Object.class, int.class });
+			java.lang.reflect.Constructor<?> constructeur = classe
+					.getConstructor(new Class[] { Object.class, int.class });
 
-			so = (SharedObject) constructeur.newInstance(new Object[] { o, id });
+			so = (SharedObject) constructeur
+					.newInstance(new Object[] { o, id });
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return so;
 	}
-	
+
 }
