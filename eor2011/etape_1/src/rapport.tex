@@ -100,12 +100,45 @@ Les méthodes \textit{lock\_read} et \textit{lock\_write} sont
 \textit{synchronized} pour rendre impossible leur execution simultané.
 Ainsi on évite des problèmes de cohérence.
 
+\section{Tests}
+
+\subsection{IRC}
+L'application \textit{IRC} fournie, a permis de verifier les bases du services.
+Mais ceci sans accès concurrents. Apres le codage 'simple' du service, sans
+synchronisation particulière, nous avons pu valider le principe de base du
+service d'objets dupliqués.
+
+Cette application simple nous a donc permis de tester en parties les etapes 1 et
+2.
+Pour tester l'accès concurrent et la cohérence des objets dupliqués, nous avons
+implanter une application dites de 'stress'.
+
+\subsection{Stress Test}
+L'application de stress utilisé est simple. Un seul objet partagé au sein du
+serveur, accédé par un nombre quelconque de clients en meme temps (avec
+ecriture ou lecture possible par chaque client). Par simplicité nous avons
+choisi un entier comme objet partagé. Sur lequel nous effectuerons des incrémentation ou
+des remise à zero.
+Nous avons donc implanter \textit{ClientSimple} qui regroupe les
+fonctionnalitées suivantes grace a une interface graphique:
+\begin{itemize}
+\item (écritures 'infinis') incrémentation de l'entier en continu.
+\item (lectures n fois) lecture de la valeur de l'entier n fois à la suite. (n
+paramétrable par l'IHM).
+\item (une écriture) remise à zero de l'entier.
+\item (écritures ou lectures 'infinis') incrémentation ou lecture aléatoirement
+en continu.
+\item (rien) pause du client.\\
+\end{itemize}
+
+Cette application a été tres utile puisqu'en lancant celle-ci sur 3+
+JVM différentes nous avons pu détecter des problèmes de cohérences et de deadlocks sur les \textit{SharedObject}s. 
 
 \section{Repartition du travail}
 Nous nous sommes occuper de la partie 1 ensemble (reflexion et
-codage).
-Bien que nous ayont réfléchis ensemble sur les deux dernières parties,
-nous avons séparer la phase de \textit{codage}:
-l'un a codé la partie 2 et l'autre la partie 3.
+codage). Pour le codage, l'un c'est occupé principalement du codage du service
+et l'autre de l'application de stress test.
+Bien que nous ayont réfléchis ensemble sur les deux dernières parties, nous
+avons séparer la phase de \textit{codage}: l'un a codé la partie 2 et l'autre la partie 3.
 
 \end{document}
