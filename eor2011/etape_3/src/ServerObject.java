@@ -96,4 +96,9 @@ public class ServerObject implements Serializable, ServerObject_itf {
 
 		return obj; // On retourne l'objet touché par le dernier ecrivain
 	}
+
+	@Override
+	public Object getObj() {
+		return obj;
+	}
 }

@@ -1,4 +1,5 @@
-import java.io.*;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 public class SharedObject implements Serializable, SharedObject_itf {
 
@@ -326,5 +327,24 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		}
 
 		return lock;
+	}
+	
+    public Object readResolve() throws ObjectStreamException {
+		Object res = this;
+		
+		System.out.println(new Throwable().fillInStackTrace().getStackTrace()[2].getClassName());
+		
+		// Unmarshaling process for the Client
+//		{
+//			SharedObject so = Client.lookup(id);
+//			if (so != null) {
+//				// SO already exists in the client!
+//				// Update ref and return the SO retrieved
+//				so.obj = obj;
+//				res = so;
+//			}
+//		}
+		
+		return res;
 	}
 }

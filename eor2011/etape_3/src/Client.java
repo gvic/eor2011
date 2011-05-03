@@ -52,7 +52,14 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		SharedObject so = null;
 
 		try {
-			id = server.lookup(name);
+			so = server.lookup_step3(name);
+			if (so != null) {
+				// Object *name* found on the server (server.lookup() didn't throw an
+				// exception)
+				// Create local copy of the Object			
+				so = instanciateStub(so.obj, so.id);
+				sharedObjectsList.put(id, so);
+			}
 		} catch (RemoteException e) { // Remote problem
 			e.printStackTrace();
 		} catch (Exception ex) {
@@ -61,15 +68,18 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 					+ " doesn't exist on the server.");
 		}
 
-		// Object *name* found on the server (server.lookup() didn't throw an
-		// exception)
-		if (id != -1) {
-			// Create local copy of the ServerObject
-			Object o = lock_read(id);
-			so = instanciateStub(o, id);
-			sharedObjectsList.put(id, so);
-			so.unlock();
+		return so;
+	}
+	
+	public static SharedObject lookup(int id) {
+		SharedObject so = null;
+		try {
+			// Force cast..
+			so = (SharedObject) sharedObjectsList.get(id);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
 		return so;
 	}
 
@@ -91,8 +101,11 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		int id;
 		SharedObject so = null;
 		try {
-			id = server.create(o);
-			so = instanciateStub(o, id);
+			// The objects used to communicate between the Client and the Server should all be SharedObjects
+			// In order to be sure that the serialization and deserialization uses our readResolve method.
+			so = instanciateStub(o, 1);
+			id = server.create(so);
+			so.id = id;
 			sharedObjectsList.put(id, so);
 		} catch (RemoteException e) {
 			e.printStackTrace();

@@ -4,4 +4,6 @@ public interface ServerObject_itf {
 
 	public Object lock_write(Client_itf c);
 
+	public Object getObj();
+	
 }
