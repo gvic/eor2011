@@ -1,0 +1,21 @@
+#!/bin/bash 
+if [ $1 -a $1 == "clean" ] ; then
+    message="\\n\\tSupression des *.class...\\n";
+    echo -e $message;
+    exec_message=`rm -f *.class`;
+    echo -e $exec_message;
+    echo -e "\\tSupression terminée.\\n";
+else
+    message="\\n\\tCompilation des sources...\\n";
+    echo -e $message;
+
+	# lancement de la commande javac pour compiler
+	echo -e "\\tJAVAC OUTPUT:";
+    exec_message=`javac *.java`;
+    echo -e $exec_message;
+
+    message="\\n\\tCompilation terminée.\\n";
+    echo -e $message;
+    
+fi;
+
