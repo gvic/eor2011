@@ -41,6 +41,20 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 		}
 		return i;
 	}
+	
+	// This method is used in the third step of the project
+	// we use SharedObjects to communicate with the Client
+	public SharedObject lookup_step3(String name) throws RemoteException {
+		SharedObject so = null;
+
+		Pair<Integer, ServerObject_itf> p = serverObjectsList.get(name);
+		if (p != null) {
+			// All given objects are SharedObjects!
+			so = (SharedObject) serverObjectsList.get(name).getSecond().getObj();
+		}		
+		
+		return so;
+	}
 
 	/*
 	 * Method used to retrieve the real object (!= lookup)
