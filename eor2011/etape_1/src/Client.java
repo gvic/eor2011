@@ -46,7 +46,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	}
 	
 	// lookup in the name server
-	public static SharedObject lookup(String name) {
+	public static Object lookup(String name) {
 		int id = -1;
 		SharedObject so = null;
 		
@@ -81,7 +81,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	}
 
 	// creation of a shared object
-	public static SharedObject create(Object o) {
+	public static Object create(Object o) {
 	// Create ServerObject in the server
 		int id;
 		SharedObject so = null;
