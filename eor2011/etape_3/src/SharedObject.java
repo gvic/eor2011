@@ -333,7 +333,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		Object res = this;
 		
 		// Who called the method the Server? the Client? ..
-//		System.out.println(new Throwable().fillInStackTrace().getStackTrace()[0].getClassName());
+		System.out.println(new Throwable().fillInStackTrace().getStackTrace()[0].getClassName());
 		
 		// Unmarshaling process for the Client
 		{
