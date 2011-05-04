@@ -53,6 +53,9 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 		try {
 			id = server.lookup(name);
+			// RMI call => Deserialization of sharedobject
+			so = (SharedObject) server.lookup_step3(name);
+
 		} catch (RemoteException e) { // Remote problem
 			e.printStackTrace();
 		} catch (Exception ex) {
@@ -62,12 +65,12 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		}
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
-		if( id != -1){
+		if( id != -1 && so != null){
 			// We need the object to instanciateStub!
 			// Let's read the object
-			Object o = lock_read(id);
+			//Object o = lock_read(id);
 			// Create local copy of the SharedObject
-			so = instanciateStub(o, id);
+//			so = instanciateStub(o, id);
 			sharedObjectsList.put(id,so);
 		}
 		return so;		
