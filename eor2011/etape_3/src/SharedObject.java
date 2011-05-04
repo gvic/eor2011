@@ -20,6 +20,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	public int lock;
 	private boolean callback_processing;
 
+	private boolean first = true;
+	
 	// Default constructor : start with No Lock
 	public SharedObject() {
 		lock = NL;
@@ -332,18 +334,19 @@ public class SharedObject implements Serializable, SharedObject_itf {
     public Object readResolve() throws ObjectStreamException {
 		Object res = this;
 		
-		System.out.println(new Throwable().fillInStackTrace().getStackTrace()[2].getClassName());
+//		System.out.println(new Throwable().fillInStackTrace().getStackTrace()[0].getClassName());
 		
 		// Unmarshaling process for the Client
-//		{
-//			SharedObject so = Client.lookup(id);
-//			if (so != null) {
-//				// SO already exists in the client!
-//				// Update ref and return the SO retrieved
-//				so.obj = obj;
-//				res = so;
-//			}
-//		}
+		if (!first){
+			SharedObject so = Client.lookup(id);
+			if (so != null) {
+				// SO already exists in the client!
+				// Update ref and return the SO retrieved
+				so.obj = obj;
+				res = so;
+				first = false;
+			}
+		} 
 		
 		return res;
 	}
