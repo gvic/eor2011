@@ -9,6 +9,7 @@ import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -23,6 +24,7 @@ public class ClientSimple extends JFrame {
 	static final int RAND = 5;
 	
 	Entier_itf entier;
+	ClientSimple me;
 	
 	JTextArea lock;
 	JTextArea value;
@@ -154,6 +156,7 @@ public class ClientSimple extends JFrame {
 	@SuppressWarnings("deprecation")
 	public ClientSimple(Entier_itf s) {
 		entier = s;
+		me = this;
 		
 		setLayout(new GridLayout(2,5));
 
@@ -193,6 +196,16 @@ public class ClientSimple extends JFrame {
 					res = false;
 				}
 				return res;
+			}
+			
+			@Override
+			public boolean shouldYieldFocus(JComponent input) {
+				boolean ok = verify(input);
+				
+				if (!ok) {
+					JOptionPane.showMessageDialog(me, "The input entered should be a number!");
+				}
+				return ok;
 			}
 		});
 		add(nbRead);
