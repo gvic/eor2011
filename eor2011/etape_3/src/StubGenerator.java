@@ -99,10 +99,15 @@ public class StubGenerator {
 			String returnCode = "";
 			String indice = (new Integer(i)).toString();
 
+
 			if (returnType.startsWith("class ")) {
 				returnType = returnType.substring(6);
 				returnCode = "return ";
+			} else if (returnType.startsWith("interface ")){
+				returnType = returnType.substring(10);
+				returnCode = "return ";
 			}
+
 
 			code += "public " + returnType + " " + method.getName() + "("
 					+ declaredParamCode + "){\n\t\t";
