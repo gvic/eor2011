@@ -332,8 +332,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
     public Object readResolve() throws ObjectStreamException {
 		Object res = this;
 		
-		// Who called the method the Server? the Client? ..
-		System.out.println(new Throwable().fillInStackTrace().getStackTrace()[0].getClassName());
+		// Is the method called ?
+		System.out.println("readResolve called!");
 		
 		// Unmarshaling process for the Client
 		{
