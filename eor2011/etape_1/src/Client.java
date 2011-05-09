@@ -61,7 +61,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
 		if( id != -1){
-			// Create local copy of the ServerObject
+			// Create local copy of the SharedObject
 			so = new SharedObject(null,id);
 			sharedObjectsList.put(id,so);
 		}
