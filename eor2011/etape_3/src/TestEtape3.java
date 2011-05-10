@@ -15,6 +15,8 @@ public class TestEtape3 extends Frame {
 	public TextField dataY;
 	Segment_itf segment;
 	static String myName;
+	
+	static int pointId = 10;
 
 	public static void main(String argv[]) {
 
@@ -44,7 +46,7 @@ public class TestEtape3 extends Frame {
 //		
 //		p1.lock_read();
 //		p2.lock_read();
-//		
+		
 		Segment_itf s = (Segment_itf) Client.lookup("segment");
 //		if (s == null) {
 //			s = (Segment_itf) Client.create(new Segment(p1, p2));
@@ -72,11 +74,11 @@ public class TestEtape3 extends Frame {
 		dataY = new TextField(60);
 		add(dataY);
 
-//		Button write_button = new Button("write p1");
-//		write_button.addActionListener(new writeP1Listener(this));
-//		add(write_button);
-		Button read_button = new Button("read p1");
-		read_button.addActionListener(new readP1Listener(this));
+		Button write_button = new Button("write p1");
+		write_button.addActionListener(new writeP1Listener(this));
+		add(write_button);
+		Button read_button = new Button("read s.p1");
+		read_button.addActionListener(new readSP1Listener(this));
 		add(read_button);
 
 		setSize(470, 300);
@@ -87,10 +89,10 @@ public class TestEtape3 extends Frame {
 	}
 }
 
-class readP1Listener implements ActionListener {
+class readSP1Listener implements ActionListener {
 	TestEtape3 etape3;
 
-	public readP1Listener(TestEtape3 i) {
+	public readSP1Listener(TestEtape3 i) {
 		etape3 = i;
 	}
 
@@ -110,36 +112,70 @@ class readP1Listener implements ActionListener {
 	}
 }
 
-//class writeP1Listener implements ActionListener {
-//	TestEtape3 etape3;
-//
-//	public writeP1Listener(TestEtape3 i) {
-//		etape3 = i;
-//	}
-//
-//	public void actionPerformed(ActionEvent e) {
-//
-//		// get the value to be written from the buffer
-//		String sX = etape3.dataX.getText();
-//		String sY = etape3.dataY.getText();
-//		double X, Y;
-//		
-//		try {
-//			X = Double.parseDouble(sX);
-//			Y = Double.parseDouble(sY);
-//		} catch (NumberFormatException ex) {
-//			ex.printStackTrace();
-//		}
-//
-//		// lock the object in write mode
-//		etape3.segment.lock_write();
-//
-//		// invoke the method
-//		etape3.segment.setE1(new Point(X,Y));
-//		etape3.dataX.setText("");
-//		etape3.dataY.setText("");
-//
-//		// unlock the object
-//		etape3.segment.unlock();
-//	}
-//}
+class readSOsListener implements ActionListener {
+	TestEtape3 etape3;
+
+	public readSOsListener(TestEtape3 i) {
+		etape3 = i;
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		// lock the object in read mode
+		etape3.segment.lock_read();
+
+		// invoke the method
+		Point_itf p = etape3.segment.getE1();
+
+		// unlock the object
+		etape3.segment.unlock();
+
+		// display the read value
+		etape3.text.append("Extremite1 de s = "+ p.toString() + "\n");
+	}
+}
+
+class writeP1Listener implements ActionListener {
+	TestEtape3 etape3;
+
+	public writeP1Listener(TestEtape3 i) {
+		etape3 = i;
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		// get the value to be written from the buffer
+		String sX = etape3.dataX.getText();
+		String sY = etape3.dataY.getText();
+		double X, Y;
+		
+		try {
+			X = Double.parseDouble(sX);
+			Y = Double.parseDouble(sY);
+			
+			Point_itf p3 = (Point_itf) Client.lookup("p"+TestEtape3.pointId);
+			if (p3 == null) {
+				p3 = (Point_itf) Client.create(new Point(X,Y));
+				Client.register("p"+TestEtape3.pointId, p3);
+			}
+			TestEtape3.pointId++;
+			
+			
+			// lock the object in write mode
+			etape3.segment.lock_write();
+
+			p3.lock_read();
+			// invoke the method
+			etape3.segment.setE1(p3);
+			p3.unlock();
+			etape3.dataX.setText("");
+			etape3.dataY.setText("");
+
+			// unlock the object
+			etape3.segment.unlock();
+		} catch (NumberFormatException ex) {
+			ex.printStackTrace();
+		}
+
+	}
+}

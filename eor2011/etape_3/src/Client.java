@@ -63,14 +63,15 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		
 		// Object *name* found on the server (server.lookup() didn't throw an exception)
 		if(id != -1){
+			// Compared to step 1&2 :
 			// We need the object to instanciateStub!
 			// Let's read the object
 			Object o = lock_read(id);
 			// Create local copy of the SharedObject
 			so = instanciateStub(o, id);
-
-			so.unlock();
 			sharedObjectsList.put(id,so);
+			// DOn't forget to unlock()!!
+			so.unlock();
 		}
 		return so;		
 	}
@@ -78,7 +79,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	public static SharedObject lookup(int id) {
 		SharedObject so = null;
 		try {
-			// Force cast..
+			// Force cast
 			so = (SharedObject) sharedObjectsList.get(id);
 		} catch (Exception e) {
 			e.printStackTrace();
