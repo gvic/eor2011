@@ -1,8 +1,6 @@
 public interface Server_itf extends java.rmi.Remote {
 
 	public int lookup(String name) throws java.rmi.RemoteException;
-
-	public Object lookup_step3(String name) throws java.rmi.RemoteException;
 	
 	public void register(String name, int id) throws java.rmi.RemoteException;
 

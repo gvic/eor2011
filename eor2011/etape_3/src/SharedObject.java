@@ -11,6 +11,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	static final int WLT = 4; // WLT : 4 : write lock taken
 	static final int RLT_WLC = 5; // RLT_WLC : 5 : read lock taken and write
 	// lock cache
+	
+	boolean client_callback = false; // Deserialization done by server the first time
 
 	// The object
 	public Object obj;
@@ -18,6 +20,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	public int id;
 	// The lock
 	public int lock;
+	
 	private boolean callback_processing;
 	
 	// Default constructor : start with No Lock
@@ -335,16 +338,23 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		// Is the method called ?
 		System.out.println("readResolve called!");
 		
-		// Unmarshaling process for the Client
-		{
-			SharedObject so = Client.lookup(id);
-			if (so != null) {
-				// SO already exists in the client!
-				// Update ref and return the SO retrieved
-				so.obj = obj;
-				res = so;
+		// Unmarshaling process for the Client but not for the server..
+		if (client_callback){
+			try {
+				SharedObject so = Client.lookup(id);
+				if (so != null) {
+					// SO already exists in the client!
+					// Update ref and return the SO retrieved
+					so.obj = obj;
+					res = so;
+				}
+			} catch(NullPointerException ex) {
+				ex.printStackTrace();
+				// Exception raised because called by server
 			}
-		} 
+		} else {
+			client_callback = true;
+		}
 		
 		return res;
 	}

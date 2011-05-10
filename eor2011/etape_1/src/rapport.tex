@@ -103,7 +103,7 @@ Ainsi on évite des problèmes de cohérence.
 \section{Tests}
 
 \subsection{IRC}
-L'application \textit{IRC} fournie, a permis de verifier les bases du services.
+L'application \textit{IRC} fournie, a permis de verifier les bases du service.
 Mais ceci sans accès concurrents. Apres le codage 'simple' du service, sans
 synchronisation particulière, nous avons pu valider le principe de base du
 service d'objets dupliqués.
@@ -114,13 +114,13 @@ Pour tester l'accès concurrent et la cohérence des objets dupliqués, nous avons
 implanter une application dites de 'stress'.
 
 \subsection{Stress Test}
-L'application de stress utilisé est simple. Un seul objet partagé au sein du
-serveur, accédé par un nombre quelconque de clients en meme temps (avec
+L'application de stress que nous avons implanté est simple. Un seul objet
+partagé au sein du serveur, accédé par un nombre quelconque de clients en meme temps (avec
 ecriture ou lecture possible par chaque client). Par simplicité nous avons
-choisi un entier comme objet partagé. Sur lequel nous effectuerons des incrémentation ou
-des remise à zero.
+choisi un entier comme objet partagé. Sur lequel nous effectuerons des
+incrémentations ou des remisse à zero.
 Nous avons donc implanter \textit{ClientSimple} qui regroupe les
-fonctionnalitées suivantes grace a une interface graphique:
+fonctionnalitées suivantes grace à une interface graphique:
 \begin{itemize}
 \item (écritures 'infinis') incrémentation de l'entier en continu.
 \item (lectures n fois) lecture de la valeur de l'entier n fois à la suite. (n
@@ -135,7 +135,7 @@ Cette application a été tres utile puisqu'en lancant celle-ci sur 3+
 JVM différentes nous avons pu détecter des problèmes de cohérences et de deadlocks sur les \textit{SharedObject}s. 
 
 \section{Repartition du travail}
-Nous nous sommes occuper de la partie 1 ensemble (reflexion et
+Nous nous sommes occupé de la partie 1 ensemble (reflexion et
 codage). Pour le codage, l'un c'est occupé principalement du codage du service
 et l'autre de l'application de stress test.
 Bien que nous ayont réfléchis ensemble sur les deux dernières parties, nous
