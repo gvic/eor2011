@@ -1,5 +1,8 @@
 #!/bin/bash 
 
+`rm -rf bin`;
+`mkdir bin`;
+
 if [ $1 -a $1 == "clean" ] ; then
     message="\\n\\tSupression des *.class de toutes les étapes...\\n";
     echo -e $message;
