@@ -162,8 +162,9 @@ public class Server extends UnicastRemoteObject implements Server_itf {
 			Integer I = new Integer(args[0]);
 			port = I.intValue();
 		} catch (Exception ex) {
-			System.out.println(" Please enter: Server <port>");
-			return;
+//			System.out.println(" Please enter: Server <port>");
+//			return;
+			port = 8008;
 		}
 		
 		try {
