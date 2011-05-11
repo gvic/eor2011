@@ -79,7 +79,7 @@ la valeur spécifier par les automates.
 \paragraph{}
 La troisiéme chose consiste à envoyer la requete de verouillage au
 serveur sans créer de \textit{deadlocks}.
-Sachant que l'objet \textit{SharedObject} doit étre synchronisé durant
+Sachant que l'objet \textit{SharedObject} doit être synchronisé durant
 le changement de la valeur de son verrou, il faut réalisé la requéte
 vers le serveur en dehors du bloc synchronisé pour éviter tout interblocage.
 
@@ -90,10 +90,9 @@ un client, on verifie si le sharedObject que l'on deserialize n'est pas deja
 present dans celui-ci. S'il n'est pas present on doit le creer dans le client en
 recuperant sont object aupres du server.
 
-Nous avons egalement ajouter deux methodes simples \textit{SharedObject
-\textbf{lookup}(int id)} et
-\textit{void \textbf{add}(int id, SharedObject_itf so)} dans la classe Client
-pour cela.
+Nous avons egalement ajouter deux methodes simples
+\textit{SharedObject lookup}(int id)} et \textit{void add(int id,
+    SharedObject_itf so)} dans la classe Client pour cela.
 
 
 \subsection{Client}
@@ -137,7 +136,7 @@ ecriture ou lecture possible par chaque client). Par simplicité nous avons
 choisi un entier comme objet partagé. Sur lequel nous effectuerons des incrémentations ou
 des remises à zero.
 Nous avons donc implanter \textit{ClientSimple} qui regroupe les
-fonctionnalitées suivantes gréce à une interface graphique:
+fonctionnalitées suivantes grâce à une interface graphique:
 \begin{itemize}
 \item (écritures 'infinies') incrémentation de l'entier en continu.
 \item (lectures n fois) lecture de la valeur de l'entier n fois à la suite. (n
@@ -155,7 +154,7 @@ JVM différentes nous avons pu détecter des problémes de cohérences et de deadloc
 Nous nous sommes occuper de la partie 1 ensemble (reflexion et
 codage). Pour le codage, l'un s'est occupé principalement du codage du service
 et l'autre de l'application de stress test.
-Bien que nous ayont réfléchis ensemble sur les deux derniéres parties, nous
+Bien que nous ayont reflechis ensemble sur les deux derniéres parties, nous
 avons séparer la phase de \textit{codage}: l'un a codé la partie 2 et l'autre la partie 3.
 
 \end{document}
