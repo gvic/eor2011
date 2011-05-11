@@ -14,136 +14,145 @@
 \begin{document}
 
 \title{Projet long d'intergiciels : \\Service de partage d'objets
-  dupliqués en Java}   % type title between braces
+  dupliquï¿½s en Java}   % type title between braces
 \author{Paul Bonaud\\Victor Godayer}         % type author(s) between braces
 \date\today    % type date between braces
 \maketitle
 
 \begin{abstract}
-  Ce projet avait pour but de nous faire développer un service de gestion
-  d'objet partagés.
-  Pour l'utilisateur, le service accessible est interfacé par un objet
-  nommé \textit{SharedObject}.
-  La gestion de la cohérence est prise en main par le backend (i.e. la couche
+  Ce projet avait pour but de nous faire dï¿½velopper un service de gestion
+  d'objet partagï¿½s.
+  Pour l'utilisateur, le service accessible est interfacï¿½ par un objet
+  nommï¿½ \textit{SharedObject}.
+  La gestion de la cohï¿½rence est prise en main par le backend (i.e. la couche
   client et la couche serveur).
 \end{abstract}
 
 \section{Introduction}
-Par soucis de concision nous avons choisi de ne pas présenter le
-service, étant donné que vous êtes le fournisseur des spécifications
+Par soucis de concision nous avons choisi de ne pas prï¿½senter le
+service, ï¿½tant donnï¿½ que vous ï¿½tes le fournisseur des spï¿½cifications
 ainsi que le lecteur du rapport...
-On ne parlera donc que des choix de conception et des problèmes rencontrés.
+On ne parlera donc que des choix de conception et des problï¿½mes rencontrï¿½s.
 
 
 \section{Conception}
 \subsection{SharedObject}
 
 \paragraph{}
-Cette entité a pour rôle d'implanter les méthodes métier du service. 
-On y trouve également les \textit{callbacks} que le
-serveur appelle lorsqu'il a besoin d'invalider un écrivain, un
-lecteur, ou de réduire le verrou.
+Cette entitï¿½ a pour rï¿½le d'implanter les mï¿½thodes mï¿½tier du service. 
+On y trouve ï¿½galement les \textit{callbacks} que le
+serveur appelle lorsqu'il a besoin d'invalider un ï¿½crivain, un
+lecteur, ou de rï¿½duire le verrou.
 
 \paragraph{}
-En terme de synchronisation nous avons du faire attention à 3
+En terme de synchronisation nous avons du faire attention ï¿½ 3
 choses.
 
 \paragraph{}
-La première a été d'attendre qu'une quelconque invalidation ou
-réduction de verrou soit terminée avant d'executer une méthode métier
+La premiï¿½re a ï¿½tï¿½ d'attendre qu'une quelconque invalidation ou
+rï¿½duction de verrou soit terminï¿½e avant d'executer une mï¿½thode mï¿½tier
 du service.
 Nous avons mis en oeuvre cette technique en notifiant la fin de
-l'appel d'une méthode d'invalidation grâce à \textit{notify}.
-Du côté métier, la méthode \textit{wait} attendait cette notification
-s'il y avait lieu d'attendre, avant d'opérer dans la modification de
+l'appel d'une mï¿½thode d'invalidation grï¿½ce ï¿½ \textit{notify}.
+Du cï¿½tï¿½ mï¿½tier, la mï¿½thode \textit{wait} attendait cette notification
+s'il y avait lieu d'attendre, avant d'opï¿½rer dans la modification de
 la valeur du verrou.
 
 \paragraph{}
-La deuxième concerne les méthodes dites \textit{callback}.
-Elle concerne spécialement le changement d'un verrou, lorsque celui ci
-est dans l'état \emph{taken}.
-Lorsqu'il est dans cet état, il est impératif d'attendre que
-l'utilisateur déverouille l'objet avant de pouvoir faire quoi que ce
+La deuxiï¿½me concerne les mï¿½thodes dites \textit{callback}.
+Elle concerne spï¿½cialement le changement d'un verrou, lorsque celui ci
+est dans l'ï¿½tat \emph{taken}.
+Lorsqu'il est dans cet ï¿½tat, il est impï¿½ratif d'attendre que
+l'utilisateur dï¿½verouille l'objet avant de pouvoir faire quoi que ce
 soit.
-Cet attente est implanter par la même méthode \textit{wait} que
-précédement. 
-C'est lors de l'appel de la méthode \textit{unlock} que l'execution du
-\textit{callback} sera réveillé par \textit{notify}.
-A la suite d'un déverouillage de l'objet par l'utilisateur, le verrou
-se trouve dans l'état \textit{cached}. Il faut donc le positionner à
-la valeur spécifier par les automates.
+Cet attente est implanter par la mï¿½me mï¿½thode \textit{wait} que
+prï¿½cï¿½dement. 
+C'est lors de l'appel de la mï¿½thode \textit{unlock} que l'execution du
+\textit{callback} sera rï¿½veillï¿½ par \textit{notify}.
+A la suite d'un dï¿½verouillage de l'objet par l'utilisateur, le verrou
+se trouve dans l'ï¿½tat \textit{cached}. Il faut donc le positionner ï¿½
+la valeur spï¿½cifier par les automates.
 
 \paragraph{}
-La troisième chose consiste à envoyer la requete de verouillage au
-serveur sans créer de \textit{deadlocks}.
-Sachant que l'objet \textit{SharedObject} doit être synchronisé durant
-le changement de la valeur de son verrou, il faut réalisé la requête
-vers le serveur en dehors du bloc synchronisé pour éviter tout interblocage.
+La troisiï¿½me chose consiste ï¿½ envoyer la requete de verouillage au
+serveur sans crï¿½er de \textit{deadlocks}.
+Sachant que l'objet \textit{SharedObject} doit ï¿½tre synchronisï¿½ durant
+le changement de la valeur de son verrou, il faut rï¿½alisï¿½ la requï¿½te
+vers le serveur en dehors du bloc synchronisï¿½ pour ï¿½viter tout interblocage.
 
+\paragraph{}
+Pour l'etape 3, il a fallu specifier la methode \textit{readResolve}.
+Celle-ci afin de specifier la deserialization d'un \textit{sharedObject}. Chez
+un client, on verifie si le sharedObject que l'on deserialize n'est pas deja
+present dans celui-ci. S'il n'est pas present on doit le creer dans le client en
+recuperant sont object aupres du server.
 
-
+Nous avons egalement ajouter deux methodes simples \textit{SharedObject
+\textbf{lookup}(int id)} et
+\textit{void \textbf{add}(int id, SharedObject_itf so)} dans la classe Client
+pour cela.
 
 
 \subsection{Client}
-Rien de très compliqué dans la version de l'étape 1.
-Pour ce qui est de l'étape 2, il faut instancier l'objet partagé par
+Rien de trï¿½s compliquï¿½ dans la version de l'ï¿½tape 1.
+Pour ce qui est de l'ï¿½tape 2, il faut instancier l'objet partagï¿½ par
 le constructeur du \textit{stub}.
-Ceci est réalisé dans la méthode \textit{instanciateStub}.
+Ceci est rï¿½alisï¿½ dans la mï¿½thode \textit{instanciateStub}.
 
 \subsection{Server}
-Rien à préciser, tout était clairement spécifier dans le sujet du
+Rien ï¿½ prï¿½ciser, tout ï¿½tait clairement spï¿½cifier dans le sujet du
 projet.
 
-On voit qu'il est nécessaire de synchroniser l'accès à l'objet
-\textit{idCpt}, de manière à éviter des incrémentations cahotiques et
-ingérables. Ainsi on préserve la propriété d'unicité de
-l'identifiant libéré.
+On voit qu'il est nï¿½cessaire de synchroniser l'accï¿½s ï¿½ l'objet
+\textit{idCpt}, de maniï¿½re ï¿½ ï¿½viter des incrï¿½mentations cahotiques et
+ingï¿½rables. Ainsi on prï¿½serve la propriï¿½tï¿½ d'unicitï¿½ de
+l'identifiant libï¿½rï¿½.
 
 \subsection{ServerObject}
 
-Les méthodes \textit{lock\_read} et \textit{lock\_write} sont
-\textit{synchronized} pour rendre impossible leur execution simultanée.
-Ainsi on évite des problèmes de cohérence.
+Les mï¿½thodes \textit{lock\_read} et \textit{lock\_write} sont
+\textit{synchronized} pour rendre impossible leur execution simultanï¿½e.
+Ainsi on ï¿½vite des problï¿½mes de cohï¿½rence.
 
 \section{Tests}
 
 \subsection{IRC}
 L'application \textit{IRC} fournie, a permis de verifier les bases du service.
-Mais ceci sans accès concurrents. Après le codage 'simple' du service, sans
-synchronisation particulière, nous avons pu valider le principe de base du
-service d'objets dupliqués.
+Mais ceci sans accï¿½s concurrents. Aprï¿½s le codage 'simple' du service, sans
+synchronisation particuliï¿½re, nous avons pu valider le principe de base du
+service d'objets dupliquï¿½s.
 
 Cette application simple nous a donc permis de tester en partie les etapes 1 et
 2.
-Pour tester l'accès concurrent et la cohérence des objets dupliqués, nous avons
+Pour tester l'accï¿½s concurrent et la cohï¿½rence des objets dupliquï¿½s, nous avons
 implanter une application dites de 'stress'.
 
 \subsection{Stress Test}
-L'application de stress utilisée est simple. Un seul objet partagé au sein du
-serveur, accédé par un nombre quelconque de clients en meme temps (avec
-ecriture ou lecture possible par chaque client). Par simplicité nous avons
-choisi un entier comme objet partagé. Sur lequel nous effectuerons des incrémentations ou
-des remises à zero.
+L'application de stress utilisï¿½e est simple. Un seul objet partagï¿½ au sein du
+serveur, accï¿½dï¿½ par un nombre quelconque de clients en meme temps (avec
+ecriture ou lecture possible par chaque client). Par simplicitï¿½ nous avons
+choisi un entier comme objet partagï¿½. Sur lequel nous effectuerons des incrï¿½mentations ou
+des remises ï¿½ zero.
 Nous avons donc implanter \textit{ClientSimple} qui regroupe les
-fonctionnalitées suivantes grâce à une interface graphique:
+fonctionnalitï¿½es suivantes grï¿½ce ï¿½ une interface graphique:
 \begin{itemize}
-\item (écritures 'infinies') incrémentation de l'entier en continu.
-\item (lectures n fois) lecture de la valeur de l'entier n fois à la suite. (n
-paramétrable par l'IHM).
-\item (une écriture) remise à zero de l'entier.
-\item (écritures ou lectures 'infinies') incrémentation ou lecture aléatoirement
+\item (ï¿½critures 'infinies') incrï¿½mentation de l'entier en continu.
+\item (lectures n fois) lecture de la valeur de l'entier n fois ï¿½ la suite. (n
+paramï¿½trable par l'IHM).
+\item (une ï¿½criture) remise ï¿½ zero de l'entier.
+\item (ï¿½critures ou lectures 'infinies') incrï¿½mentation ou lecture alï¿½atoirement
 en continu.
 \item (rien) pause du client.\\
 \end{itemize}
 
-Cette application a été très utile puisqu'en lancant celle-ci sur 3 ou plus
-JVM différentes nous avons pu détecter des problèmes de cohérences et de deadlocks sur les \textit{SharedObject}s. 
+Cette application a ï¿½tï¿½ trï¿½s utile puisqu'en lancant celle-ci sur 3 ou plus
+JVM diffï¿½rentes nous avons pu dï¿½tecter des problï¿½mes de cohï¿½rences et de deadlocks sur les \textit{SharedObject}s. 
 
 \section{Repartition du travail}
 Nous nous sommes occuper de la partie 1 ensemble (reflexion et
-codage). Pour le codage, l'un s'est occupé principalement du codage du service
+codage). Pour le codage, l'un s'est occupï¿½ principalement du codage du service
 et l'autre de l'application de stress test.
-Bien que nous ayont réfléchis ensemble sur les deux dernières parties, nous
-avons séparer la phase de \textit{codage}: l'un a codé la partie 2 et l'autre la partie 3.
+Bien que nous ayont rï¿½flï¿½chis ensemble sur les deux derniï¿½res parties, nous
+avons sï¿½parer la phase de \textit{codage}: l'un a codï¿½ la partie 2 et l'autre la partie 3.
 
 \end{document}
