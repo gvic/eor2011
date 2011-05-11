@@ -1,4 +1,0 @@
-Questions a poser : 
-
- - Si le client demande un objet qu'il n'a pas créé lui meme, comment fait on pour récuperer le SharedObject ?
- 	Peut on faire une méthode a nous ? 
